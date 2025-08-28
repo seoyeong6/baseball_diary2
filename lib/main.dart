@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:baseball_diary2/widgets/themes.dart';
 import 'package:baseball_diary2/main_navigation_screen.dart';
+import 'package:baseball_diary2/services/auth_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthService().initialize();
   runApp(const BaseballDiaryApp());
 }
 
@@ -12,8 +16,10 @@ class BaseballDiaryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Baseball Diary',
-      theme: ThemeData(primarySwatch: Colors.grey),
-      home: MainNavigationScreen(),
+      home: const MainNavigationScreen(),
+      theme: Themes().lightTheme,
+      darkTheme: Themes().darkTheme,
+      themeMode: ThemeMode.system,
     );
   }
 }

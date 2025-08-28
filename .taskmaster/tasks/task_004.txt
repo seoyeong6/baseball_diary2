@@ -1,0 +1,55 @@
+# Task ID: 4
+# Title: 기록 작성 탭 구현
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: 제목, 본문, 감정, 사진을 포함한 일기 작성 화면과 저장 기능 구현
+# Details:
+1. RecordScreen 위젯 생성하여 main_navigation_screen.dart의 placeholder 교체 2. image_picker: ^1.0.4 패키지 추가 3. 제목 입력 TextField 4. 본문 입력 TextFormField (multiline) 5. 감정 선택 UI: 5-7개 감정을 가로 스크롤 가능한 Row로 배치 6. 사진 첨부 기능: ImagePicker로 갤러리에서 1장만 선택 7. 선택된 사진 미리보기와 삭제 기능 8. 저장 버튼과 유효성 검증 (제목 필수) 9. 저장 시 DiaryService를 통해 Firestore/로컬 DB에 저장 10. path_provider로 이미지 로컬 저장 경로 관리
+
+# Test Strategy:
+폼 유효성 검증 테스트, 이미지 선택/저장 테스트, 기록 저장 기능 테스트, 1장 제한 로직 테스트
+
+# Subtasks:
+## 1. 필요한 패키지 추가 [pending]
+### Dependencies: None
+### Description: 이미지 선택 및 경로 관리를 위한 패키지 추가
+### Details:
+image_picker: ^1.0.4, path_provider 패키지를 pubspec.yaml에 추가
+
+## 2. RecordScreen 위젯 생성 [pending]
+### Dependencies: 4.1
+### Description: 기록 작성 화면 위젯 기본 구조 생성
+### Details:
+StatefulWidget으로 RecordScreen 생성. main_navigation_screen.dart placeholder 교체
+
+## 3. 제목/본문 입력 폼 구현 [pending]
+### Dependencies: 4.2
+### Description: 제목과 본문을 입력할 수 있는 TextField 구현
+### Details:
+제목용 TextField와 multiline 본문용 TextFormField 구현. Form validation 설정
+
+## 4. 감정 선택 UI 구현 [pending]
+### Dependencies: 4.3
+### Description: 5-7개 감정을 가로 스크롤로 선택할 수 있는 UI 구현
+### Details:
+감정별 아이콘과 텍스트가 있는 Card 위젯. SingleChildScrollView로 가로 스크롤 구현
+
+## 5. 사진 첨부 기능 구현 [pending]
+### Dependencies: 4.4
+### Description: ImagePicker를 사용한 갤러리에서 사진 선택 기능 구현
+### Details:
+ImagePicker로 갤러리에서 1장만 선택. 선택된 사진 미리보기 및 삭제 기능
+
+## 6. 유효성 검증 및 저장 기능 구현 [pending]
+### Dependencies: 4.5
+### Description: 폼 유효성 검증과 DiaryService를 통한 저장 기능 구현
+### Details:
+제목 필수 입력 검증. path_provider로 이미지 저장. DiaryService를 통한 데이터 저장
+
+## 7. 기록 작성 화면 테스트 작성 [pending]
+### Dependencies: 4.6
+### Description: 기록 작성 기능에 대한 단위 테스트 및 위젯 테스트 작성
+### Details:
+폼 유효성 검증, 이미지 선택, 저장 기능에 대한 테스트 작성
+

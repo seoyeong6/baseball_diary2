@@ -1,0 +1,43 @@
+# Task ID: 8
+# Title: 설정 탭 구현
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: 다크모드 전환, 응원팀 변경, 데이터 관리 기능이 포함된 설정 화면 구현
+# Details:
+1. SettingsScreen 위젯 생성하여 main_navigation_screen.dart의 placeholder 교체 2. 다크모드 on/off 토글 스위치 추가 3. 현재 선택된 응원팀 표시 및 변경 기능 4. 팀 변경 시 TeamSelectionScreen 재사용 5. 데이터 백업/내보내기 기능 (JSON 형태) 6. 앱 정보 (버전, 개발자 정보) 표시 7. 로그아웃 기능 (AuthService 연동) 8. 설정 변경사항 즉시 반영 9. share_plus: ^7.2.1 패키지로 데이터 내보내기 구현
+
+# Test Strategy:
+설정 저장/불러오기 테스트, 다크모드 전환 테스트, 팀 변경 기능 테스트, 데이터 내보내기 테스트
+
+# Subtasks:
+## 1. SettingsScreen 위젯 생성 [pending]
+### Dependencies: None
+### Description: 설정 화면 위젯 기본 구조 생성
+### Details:
+StatefulWidget으로 SettingsScreen 생성. main_navigation_screen.dart placeholder 교체
+
+## 2. 다크모드 토글 기능 구현 [pending]
+### Dependencies: 8.1
+### Description: 다크모드 on/off 토글 스위치 기능 추가
+### Details:
+Switch 위젯으로 다크모드 토글. 설정 변경 사항 즉시 반영
+
+## 3. 응원팀 변경 기능 구현 [pending]
+### Dependencies: 8.2
+### Description: 현재 선택된 응원팀 표시 및 변경 기능 구현
+### Details:
+현재 팀 표시. 팀 변경 시 TeamSelectionScreen 재사용. 변경 사항 저장
+
+## 4. 데이터 백업/내보내기 기능 구현 [pending]
+### Dependencies: 8.3
+### Description: 데이터를 JSON 형태로 백업/내보내기 기능 구현
+### Details:
+share_plus: ^7.2.1 패키지로 데이터 내보내기. JSON 형태로 전체 데이터 직렬화
+
+## 5. 앱 정보 및 로그아웃 기능 구현 [pending]
+### Dependencies: 8.4
+### Description: 앱 버전, 개발자 정보 표시 및 로그아웃 기능 추가
+### Details:
+앱 버전, 개발자 정보 표시. AuthService 연동하여 로그아웃 기능 구현
+

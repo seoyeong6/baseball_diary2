@@ -1,0 +1,55 @@
+# Task ID: 7
+# Title: 통계 탭 및 차트 구현
+# Status: pending
+# Dependencies: 1, 5
+# Priority: medium
+# Description: 감정 데이터 기반 시각화와 팀별 기록 통계를 보여주는 화면 구현
+# Details:
+1. StatisticsScreen 위젯 생성하여 main_navigation_screen.dart의 placeholder 교체 2. fl_chart: ^0.66.2 패키지 추가 3. 감정별 비율 파이 차트 구현 4. 기간별(월별) 기분 변화 라인 차트 구현 5. 총 기록 수, 이번 달 기록 수 등 요약 통계 표시 6. 선택한 팀 색상을 차트 테마에 적용 7. 기간 필터 기능 (최근 1개월, 3개월, 1년) 8. 차트 데이터 캐싱으로 성능 최적화 9. 데이터가 없을 때 안내 메시지 표시
+
+# Test Strategy:
+차트 렌더링 테스트, 데이터 집계 로직 테스트, 필터 기능 테스트, 빈 데이터 상태 테스트
+
+# Subtasks:
+## 1. fl_chart 패키지 추가 [pending]
+### Dependencies: None
+### Description: fl_chart 패키지를 pubspec.yaml에 추가
+### Details:
+fl_chart: ^0.66.2 패키지 추가 및 flutter pub get 실행
+
+## 2. StatisticsScreen 위젯 생성 [pending]
+### Dependencies: 7.1
+### Description: 통계 화면 위젯 기본 구조 생성
+### Details:
+StatefulWidget으로 StatisticsScreen 생성. main_navigation_screen.dart placeholder 교체
+
+## 3. 감정별 파이 차트 구현 [pending]
+### Dependencies: 7.2
+### Description: 감정별 비율을 나타내는 파이 차트 구현
+### Details:
+PieChart 위젯으로 감정별 데이터 비율 시각화. 팀 색상 테마 적용
+
+## 4. 기간별 라인 차트 구현 [pending]
+### Dependencies: 7.3
+### Description: 기간별 기분 변화를 나타내는 라인 차트 구현
+### Details:
+LineChart 위젯으로 월별 기분 변화 시각화. 데이터 집계 로직 구현
+
+## 5. 요약 통계 정보 표시 [pending]
+### Dependencies: 7.4
+### Description: 총 기록 수, 이번 달 기록 수 등 요약 통계 표시
+### Details:
+Card 위젯으로 주요 통계 지표 표시. 전체/월별 기록 수 집계
+
+## 6. 기간 필터 및 캐싱 기능 구현 [pending]
+### Dependencies: 7.5
+### Description: 기간 필터 기능과 차트 데이터 캐싱 기능 구현
+### Details:
+최근 1개월, 3개월, 1년 필터. 차트 데이터 캐싱으로 성능 최적화
+
+## 7. 빈 데이터 상태 처리 [pending]
+### Dependencies: 7.6
+### Description: 데이터가 없을 때 안내 메시지 표시 기능 구현
+### Details:
+데이터가 없을 때 안내 메시지 및 일러스트레이션 표시
+

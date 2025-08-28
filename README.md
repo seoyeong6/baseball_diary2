@@ -1,16 +1,57 @@
-# baseball_diary2
+# ⚾ Baseball Diary
 
-A new Flutter project.
+야구 팬들을 위한 기록 애플리케이션입니다.  
+10개 구단 중 한 팀을 선택하고, 경기와 관련된 **기분/글/사진**을 기록할 수 있습니다.  
+캘린더, 통계, 다크모드 지원까지 포함한 올인원 야구 다이어리 앱입니다.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📱 주요 기능
 
-A few resources to get you started if this is your first Flutter project:
+- **팀 선택:** 10개 구단 중 하나를 선택하여 나만의 응원 다이어리 시작
+- **캘린더 탭:** 날짜별 기록 여부 확인, 경기일자 중심 기록 관리
+- **기록 목록 탭:** 작성된 기록들을 리스트 형태로 확인 (썸네일/감정/제목 미리보기)
+- **기록 작성 탭:** 제목, 본문, 감정, 사진을 포함한 기록 작성
+- **통계 탭:** 감정 데이터 시각화 (Pie Chart / Line Chart)
+- **설정 탭:** 다크모드 on/off, 팀 변경, 데이터 관리
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠 기술 스택
+
+- **프레임워크:** Flutter  
+- **상태 관리:** Riverpod 2.0 (MVVM 아키텍처)  
+- **데이터 저장:**  
+  - Firebase Firestore (로그인 사용자)  
+  - SharedPreferences / 로컬 DB (비로그인 사용자)  
+- **사진 업로드:** [image_picker](https://pub.dev/packages/image_picker)  
+- **차트 시각화:** [fl_chart](https://pub.dev/packages/fl_chart)  
+
+---
+
+## 📂 화면 구성
+
+1. **캘린더 탭** – 달력으로 기록 확인 및 접근  
+2. **기록 목록 탭** – 전체 기록 리스트  
+3. **기록 작성 탭** – 텍스트, 감정, 사진 포함 기록 작성  
+4. **통계 탭** – 감정 기반 통계 시각화  
+5. **설정 탭** – 다크모드, 팀 변경, 데이터 관리  
+
+---
+
+## 🔄 사용자 흐름
+
+1. 앱 실행 → 팀 선택 화면 → 메인 탭 구조 진입  
+2. 캘린더에서 날짜 선택 → 기록 확인/작성  
+3. 기록 작성 후 목록 & 캘린더 자동 반영  
+4. 통계 탭에서 기록 패턴 확인  
+5. 설정 탭에서 다크모드 & 팀 변경 가능  
+
+---
+
+## 🚀 향후 확장 아이디어
+
+- Firebase Authentication을 통한 로그인 및 클라우드 동기화  
+- 팬들과 기록 공유 기능  
+- 경기일 알림 기능 (기록 작성 리마인더)  
+- 기록 태그 기능 (선수 이름, 경기 장소 등) 

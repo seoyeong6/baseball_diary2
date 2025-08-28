@@ -1,0 +1,49 @@
+# Task ID: 5
+# Title: 기록 목록 탭 구현
+# Status: pending
+# Dependencies: 1, 4
+# Priority: medium
+# Description: 작성된 일기들을 리스트 형태로 표시하고 정렬, 검색 기능을 포함한 화면 구현
+# Details:
+1. DiaryListScreen 위젯 생성하여 main_navigation_screen.dart의 placeholder 교체 2. StreamBuilder 또는 FutureBuilder로 실시간 기록 목록 조회 3. ListView.builder로 기록 카드 리스트 구성 4. 각 카드에 썸네일 이미지, 감정 아이콘, 제목, 작성일 표시 5. 최신순/날짜순 정렬 옵션 추가 6. 당겨서 새로고침(pull-to-refresh) 기능 7. 카드 클릭 시 상세보기 화면으로 이동 8. 슬라이드로 삭제 기능 (Dismissible 위젯) 9. 빈 상태일 때 안내 메시지 표시
+
+# Test Strategy:
+목록 렌더링 테스트, 정렬 기능 테스트, 삭제 동작 테스트, 빈 상태 UI 테스트
+
+# Subtasks:
+## 1. DiaryListScreen 위젯 생성 [pending]
+### Dependencies: None
+### Description: 기록 목록을 표시할 화면 위젯 기본 구조 생성
+### Details:
+StatefulWidget으로 DiaryListScreen 생성. main_navigation_screen.dart placeholder 교체
+
+## 2. 실시간 데이터 조회 구현 [pending]
+### Dependencies: 5.1
+### Description: StreamBuilder 또는 FutureBuilder로 실시간 기록 목록 조회 기능 구현
+### Details:
+DiaryService와 연동하여 실시간 데이터 스트림 구현. StreamBuilder로 UI 자동 업데이트
+
+## 3. 기록 카드 리스트 UI 구성 [pending]
+### Dependencies: 5.2
+### Description: ListView.builder로 기록 카드 리스트 UI 구현
+### Details:
+각 카드에 썸네일 이미지, 감정 아이콘, 제목, 작성일 표시. Card 위젯으로 일관된 디자인
+
+## 4. 정렬 및 필터 기능 구현 [pending]
+### Dependencies: 5.3
+### Description: 최신순/날짜순 정렬 옵션 및 필터 기능 추가
+### Details:
+정렬 드롭다운 메뉴 추가. 날짜순/최신순 정렬 로직 구현. 감정별 필터링 옵션
+
+## 5. 상호작용 기능 구현 [pending]
+### Dependencies: 5.4
+### Description: 카드 클릭 네비게이션 및 슬라이드 삭제 기능 구현
+### Details:
+카드 클릭 시 상세보기 화면으로 이동. Dismissible 위젯으로 슬라이드 삭제 기능
+
+## 6. 추가 UX 기능 구현 [pending]
+### Dependencies: 5.5
+### Description: pull-to-refresh 및 빈 상태 처리 구현
+### Details:
+RefreshIndicator로 당겨서 새로고침 구현. 빈 상태일 때 안내 메시지 및 일러스트 표시
+

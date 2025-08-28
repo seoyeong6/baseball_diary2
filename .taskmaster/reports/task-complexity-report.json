@@ -1,0 +1,109 @@
+{
+	"meta": {
+		"generatedAt": "2025-08-28T19:47:17.617Z",
+		"tasksAnalyzed": 12,
+		"totalTasks": 12,
+		"analysisCount": 12,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "데이터 모델 및 서비스 설계 구현",
+			"complexityScore": 8,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "야구팀, 감정, 기록, 스티커 데이터 모델과 Firestore/로컬 DB 연동 서비스를 각 모델별, 서비스별로 세분화하여 구현. 기존 AuthService와 User 모델 패턴을 참고하여 일관된 구조로 설계. SharedPreferences와 Future Firebase 연동을 고려한 추상화 레이어 구성",
+			"reasoning": "기존에 AuthService와 User 모델이 구현되어 있으나, 야구 관련 핵심 데이터 모델들과 서비스 레이어가 전혀 없음. 5개 모델(Team, DiaryEntry, Emotion, StickerData, + 서비스 클래스들)과 로컬/클라우드 이중 저장 로직이 필요하여 높은 복잡도"
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "구단 선택 화면 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "최초 실행 감지, KBO 10개 구단 데이터/에셋 준비, GridView UI 구성, 애니메이션 효과, 저장 로직, main.dart 분기 처리를 단계별로 구현. 기존 AuthService 패턴을 참고하여 팀 선택 상태 관리 구현",
+			"reasoning": "기존 main.dart와 AuthWrapper는 있지만 팀 선택 기능은 전혀 없음. UI 구성과 데이터 저장, 앱 플로우 변경이 필요하나 비교적 단순한 기능"
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "캘린더 탭 UI 및 기능 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "table_calendar 패키지 통합, 월간 캘린더 UI, 기록 데이터 연동, 감정 아이콘 표시, 스티커 모달, 날짜 클릭 네비게이션, 팀 색상 테마 적용을 각각 구현. 기존 navigation placeholder 교체 및 상태 관리 구성",
+			"reasoning": "현재 main_navigation_screen에 placeholder만 있음. 새로운 패키지 의존성과 복잡한 캘린더 로직, 데이터 연동이 필요하여 중상급 복잡도"
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "기록 작성 탭 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "image_picker 패키지 통합, 폼 UI 구성(제목/본문/감정/사진), 사진 선택/미리보기/저장, 유효성 검증, DiaryService 연동, path_provider 이미지 관리를 단계별 구현. 기존 placeholder 교체",
+			"reasoning": "현재 placeholder 상태. 이미지 처리, 폼 관리, 파일 시스템 연동 등 다양한 기능이 필요하여 높은 복잡도"
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "기록 목록 탭 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "실시간 데이터 조회(StreamBuilder/FutureBuilder), ListView 카드 UI, 정렬 기능, pull-to-refresh, 삭제 기능(Dismissible), 빈 상태 처리를 각각 구현. 기존 placeholder 교체",
+			"reasoning": "현재 placeholder 상태. 리스트 UI와 데이터 연동은 표준적이나 정렬, 삭제, 새로고침 등 추가 기능들이 필요"
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "기록 상세보기 및 수정 화면 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "상세 화면 UI, 편집 모드 전환, 수정 기능, 삭제 확인 다이얼로그, 사진 확대 기능(Hero), 변경사항 확인을 각각 구현. RecordScreen 로직 재사용 고려",
+			"reasoning": "새로운 화면이지만 RecordScreen의 로직을 상당부분 재사용 가능. 편집/삭제 기능과 Hero 애니메이션 추가가 필요"
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "통계 탭 및 차트 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "fl_chart 패키지 통합, 감정별 파이차트, 기간별 라인차트, 요약 통계, 기간 필터, 데이터 집계 로직, 캐싱, 빈 데이터 처리를 각각 구현. 기존 placeholder 교체",
+			"reasoning": "현재 placeholder 상태. 차트 라이브러리 통합과 복잡한 데이터 집계 로직이 필요하여 높은 복잡도"
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "설정 탭 구현",
+			"complexityScore": 5,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "다크모드 토글, 팀 변경 기능, 데이터 내보내기(share_plus), 앱 정보, AuthService 로그아웃 연동을 각각 구현. 기존 Themes와 AuthService 활용하여 placeholder 교체",
+			"reasoning": "현재 placeholder 상태이나 기존 AuthService, Themes 인프라를 활용 가능. 비교적 단순한 설정 UI들로 구성"
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Firebase 설정 및 클라우드 동기화 구현",
+			"complexityScore": 8,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Firebase 프로젝트 생성/설정, 패키지 추가, Android/iOS 설정, Firestore 보안 규칙, FirestoreService 클래스, 로그인/비로그인 분기, 오프라인 지원, 이미지 업로드를 각각 구현. 기존 AuthService 패턴 확장",
+			"reasoning": "현재 Firebase 관련 설정이 전혀 없음. 프로젝트 설정부터 복잡한 동기화 로직까지 많은 작업이 필요하여 높은 복잡도"
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "성능 최적화 및 캐싱 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "이미지 캐싱(cached_network_image), 페이지네이션, 데이터 캐싱(hive), 이미지 압축, 메모리 관리, 위젯 최적화를 각 영역별로 구현. 기존 코드에 점진적 적용",
+			"reasoning": "기본 앱 구조는 존재하나 성능 최적화 요소들이 전혀 없음. 각 최적화 기법들이 독립적으로 적용 가능하여 중간 복잡도"
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "UI/UX 향상 및 애니메이션 구현",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "페이지 전환 애니메이션, 감정 선택 애니메이션, 카드 피드백 효과, 로딩 UI, 스낵바, 햅틱 피드백을 각 UI 구성요소별로 구현. 기존 UI에 점진적 향상 적용",
+			"reasoning": "기본 UI는 구현되어 있어 점진적 개선이 가능. 각 애니메이션들이 독립적으로 적용 가능하여 중간 복잡도"
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "최종 테스트 및 배포 준비",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "E2E 테스트 시나리오, 실기기 테스트, 반응형 UI 확인, 접근성 개선, 앱 아이콘/스플래시, 스토어 메타데이터, 개인정보 처리방침, 배포 설정을 각각 준비. 전체 앱 통합 검증",
+			"reasoning": "모든 기능이 완성된 후 진행되는 종합적인 작업. 다양한 디바이스 테스트와 배포 준비 작업들이 필요하여 높은 복잡도"
+		}
+	]
+}
