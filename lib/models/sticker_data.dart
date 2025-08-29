@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 enum StickerType {
   // 경기 관련
@@ -13,7 +14,7 @@ enum StickerType {
   analysis('analysis', '분석', Icons.analytics, Colors.purple),
   
   // 특별한 순간
-  homerun('homerun', '홈런', Icons.sports_baseball, Colors.red),
+  homerun('homerun', '홈런', FontAwesomeIcons.baseballBatBall, Colors.red),
   strikeout('strikeout', '삼진', Icons.close, Colors.black),
   steal('steal', '도루', Icons.flash_on, Colors.cyan),
   

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../models/sticker_data.dart';
 
 class StickerPreviewScreen extends StatelessWidget {
@@ -49,11 +50,17 @@ class StickerPreviewScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              stickerType.icon,
-              size: 32,
-              color: stickerType.color,
-            ),
+            stickerType.icon.runtimeType == IconData 
+              ? Icon(
+                  stickerType.icon,
+                  size: 32,
+                  color: stickerType.color,
+                )
+              : FaIcon(
+                  stickerType.icon as IconData,
+                  size: 28,
+                  color: stickerType.color,
+                ),
             const SizedBox(height: 8),
             Text(
               stickerType.displayName,
