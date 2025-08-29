@@ -9,7 +9,7 @@
         "testStrategy": "각 모델의 toJson/fromJson 테스트, 서비스 클래스의 CRUD 동작 테스트, 네트워크 연결 없이 로컬 모드 테스트",
         "priority": "high",
         "dependencies": [],
-        "status": "done",
+        "status": "pending",
         "subtasks": [
           {
             "id": 1,
@@ -76,7 +76,7 @@
               "1.6"
             ],
             "details": "AuthService와 연동하여 로그인 상태에 따라 로컬/클라우드 저장 분기 처리",
-            "status": "done"
+            "status": "in-progress"
           },
           {
             "id": 8,
@@ -111,7 +111,7 @@
             "description": "구단 선택을 위한 화면 위젯 기본 구조 생성",
             "dependencies": [],
             "details": "StatefulWidget으로 TeamSelectionScreen 클래스 생성. lib/screens/ 디렉토리에 배치",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -119,7 +119,7 @@
             "description": "10개 KBO 구단 로고 이미지를 assets에 추가",
             "dependencies": [],
             "details": "assets/images/teams/ 폴더에 각 구단별 로고 이미지 추가. pubspec.yaml에 assets 경로 등록",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 3,
@@ -130,7 +130,7 @@
               "2.2"
             ],
             "details": "GridView.builder로 각 구단 카드 표시. 팀 색상과 로고를 적용한 Card 위젯 구성",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -140,7 +140,7 @@
               "2.3"
             ],
             "details": "선택 시 크기 변화나 색상 변화 애니메이션. AnimatedContainer나 Hero 애니메이션 사용",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 5,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-29T21:26:20.148Z",
+      "updated": "2025-08-29T22:10:46.436Z",
       "description": "Tasks for master context"
     }
   }

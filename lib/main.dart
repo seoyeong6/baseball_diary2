@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:baseball_diary2/widgets/themes.dart';
 import 'package:baseball_diary2/main_navigation_screen.dart';
+import 'package:baseball_diary2/screens/team_selection_screen.dart';
 import 'package:baseball_diary2/services/auth_service.dart';
 
 void main() async {
@@ -16,7 +17,7 @@ class BaseballDiaryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Baseball Diary',
-      home: const MainNavigationScreen(),
+      home: const TeamSelectionScreen(), // 임시로 팀 선택 화면으로 변경
       theme: Themes().lightTheme,
       darkTheme: Themes().darkTheme,
       themeMode: ThemeMode.system,

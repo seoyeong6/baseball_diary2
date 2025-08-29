@@ -45,52 +45,52 @@ class KBOTeams {
     Team(
       id: 1,
       name: 'LG 트윈스',
-      logoPath: 'assets/images/teams/lg_twins.png',
+      logoPath: 'lib/assets/images/teams/lg_twins.png',
     ),
     Team(
       id: 2,
       name: '키움 히어로즈',
-      logoPath: 'assets/images/teams/kiwoom_heroes.png',
+      logoPath: 'lib/assets/images/teams/kiwoom_heroes.png',
     ),
     Team(
       id: 3,
       name: 'KT 위즈',
-      logoPath: 'assets/images/teams/kt_wiz.png',
+      logoPath: 'lib/assets/images/teams/kt_wiz.png',
     ),
     Team(
       id: 4,
       name: 'SSG 랜더스',
-      logoPath: 'assets/images/teams/ssg_landers.png',
+      logoPath: 'lib/assets/images/teams/ssg_landers.png',
     ),
     Team(
       id: 5,
       name: 'NC 다이노스',
-      logoPath: 'assets/images/teams/nc_dinos.png',
+      logoPath: 'lib/assets/images/teams/nc_dinos.png',
     ),
     Team(
       id: 6,
       name: '두산 베어스',
-      logoPath: 'assets/images/teams/doosan_bears.png',
+      logoPath: 'lib/assets/images/teams/doosan_bears.png',
     ),
     Team(
       id: 7,
       name: 'KIA 타이거즈',
-      logoPath: 'assets/images/teams/kia_tigers.png',
+      logoPath: 'lib/assets/images/teams/kia_tigers.png',
     ),
     Team(
       id: 8,
       name: '롯데 자이언츠',
-      logoPath: 'assets/images/teams/lotte_giants.png',
+      logoPath: 'lib/assets/images/teams/lotte_giants.png',
     ),
     Team(
       id: 9,
       name: '삼성 라이온즈',
-      logoPath: 'assets/images/teams/samsung_lions.png',
+      logoPath: 'lib/assets/images/teams/samsung_lions.png',
     ),
     Team(
       id: 10,
       name: '한화 이글스',
-      logoPath: 'assets/images/teams/hanwha_eagles.png',
+      logoPath: 'lib/assets/images/teams/hanhwa-eagles.png',
     ),
   ];
 
