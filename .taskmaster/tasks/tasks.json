@@ -9,7 +9,7 @@
         "testStrategy": "각 모델의 toJson/fromJson 테스트, 서비스 클래스의 CRUD 동작 테스트, 네트워크 연결 없이 로컬 모드 테스트",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -54,7 +54,7 @@
               "1.4"
             ],
             "details": "DiaryEntry와 StickerData의 로컬 저장/불러오기 CRUD 메서드 구현",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 6,
@@ -65,7 +65,7 @@
               "1.4"
             ],
             "details": "FirebaseService 추상 클래스 정의 후 향후 Firestore 연동을 위한 메서드 시그니처 정의",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 7,
@@ -76,7 +76,7 @@
               "1.6"
             ],
             "details": "AuthService와 연동하여 로그인 상태에 따라 로컬/클라우드 저장 분기 처리",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 8,
@@ -89,7 +89,7 @@
               "1.4"
             ],
             "details": "각 모델의 직렬화/역직렬화 테스트 및 유효성 검증 테스트 작성",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-29T01:40:18.458Z",
+      "updated": "2025-08-29T21:26:20.148Z",
       "description": "Tasks for master context"
     }
   }
