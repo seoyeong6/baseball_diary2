@@ -35,7 +35,7 @@
               "1.2"
             ],
             "details": "id, title, content, emotion, imagePath, date, teamId 필드 포함. toJson/fromJson 메서드 구현",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -43,7 +43,7 @@
             "description": "캘린더에 표시할 스티커 데이터 모델 생성",
             "dependencies": [],
             "details": "id, type, date, position 필드를 포함한 StickerData 클래스 생성",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 5,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-28T23:00:49.614Z",
+      "updated": "2025-08-29T01:40:18.458Z",
       "description": "Tasks for master context"
     }
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import '../screens/team_color_preview.dart';
 import '../screens/emotion_preview.dart';
+import '../screens/sticker_preview.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -69,9 +69,9 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 40),
-            const TeamColorPreviewButton(),
-            const SizedBox(height: 16),
             const EmotionPreviewButton(),
+            const SizedBox(height: 16),
+            const StickerPreviewButton(),
           ],
         ),
       ),
@@ -97,6 +97,27 @@ class HomeScreen extends StatelessWidget {
             child: const Text('Sign Out'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StickerPreviewButton extends StatelessWidget {
+  const StickerPreviewButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const StickerPreviewScreen()),
+        );
+      },
+      icon: const Icon(Icons.star),
+      label: const Text('스티커 미리보기'),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
     );
   }
