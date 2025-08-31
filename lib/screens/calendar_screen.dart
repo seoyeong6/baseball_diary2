@@ -1,100 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../services/diary_service.dart';
+import 'package:provider/provider.dart';
+import '../controllers/calendar_controller.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
+import '../models/sticker_data.dart';
+import '../widgets/sticker_selection_modal.dart';
+import 'diary_detail_screen.dart';
+import 'record_screen.dart';
 
 /// 월간 캘린더 뷰와 일별 기록 표시, 스티커 기능이 포함된 캘린더 화면
-class CalendarScreen extends StatefulWidget {
+class CalendarScreen extends StatelessWidget {
   const CalendarScreen({super.key});
 
-  @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
-}
+  void _showStickerSelectionModal(BuildContext context, CalendarController controller) {
+    final dateToUse = controller.selectedDay ?? DateTime.now();
 
-class _CalendarScreenState extends State<CalendarScreen> {
-  late final ValueNotifier<List<DiaryEntry>> _selectedEvents;
-  final DiaryService _diaryService = DiaryService();
-  final Map<DateTime, List<DiaryEntry>> _eventCache = {};
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(<DiaryEntry>[]);
-    _initializeService();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StickerSelectionModal(
+        selectedDate: dateToUse,
+        onStickersSelected: (stickerTypes) => _onStickersSelected(context, controller, stickerTypes, dateToUse),
+      ),
+    );
   }
 
-  Future<void> _initializeService() async {
-    await _diaryService.initialize();
-    await _loadCalendarData();
-    await _loadEventsForSelectedDay();
-  }
-
-  Future<void> _loadCalendarData() async {
+  Future<void> _onStickersSelected(BuildContext context, CalendarController controller, List<StickerType> stickerTypes, DateTime selectedDate) async {
     try {
-      final lastDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
+      final entries = controller.getCachedEventsForDay(selectedDate);
+      DiaryEntry entryToUpdate;
       
-      _eventCache.clear();
-      
-      // 실제 데이터 로드
-      for (int day = 1; day <= lastDay.day; day++) {
-        final date = DateTime(_focusedDay.year, _focusedDay.month, day);
-        final normalizedDate = DateTime(date.year, date.month, date.day);
-        final entries = await _getEventsForDay(date);
-        _eventCache[normalizedDate] = entries;
-      }
-      
-      setState(() {});
-    } catch (e) {
-      debugPrint('Error loading calendar data: $e');
-    }
-  }
-
-  @override
-  void dispose() {
-    _selectedEvents.dispose();
-    super.dispose();
-  }
-
-  Future<List<DiaryEntry>> _getEventsForDay(DateTime day) async {
-    try {
-      return await _diaryService.getDiaryEntriesByDate(day);
-    } catch (e) {
-      debugPrint('Error loading diary entries for $day: $e');
-      return [];
-    }
-  }
-
-  List<DiaryEntry> _getCachedEventsForDay(DateTime day) {
-    final normalizedDate = DateTime(day.year, day.month, day.day);
-    return _eventCache[normalizedDate] ?? [];
-  }
-
-  Future<void> _loadEventsForSelectedDay() async {
-    if (_selectedDay != null) {
-      final normalizedDate = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
-      if (_eventCache.containsKey(normalizedDate)) {
-        _selectedEvents.value = _eventCache[normalizedDate]!;
+      if (entries.isEmpty) {
+        // 기록이 없으면 새 기록 생성
+        entryToUpdate = DiaryEntry(
+          id: '${DateTime.now().millisecondsSinceEpoch}',
+          title: '${selectedDate.year}/${selectedDate.month}/${selectedDate.day}',
+          content: '',
+          emotion: Emotion.neutral,
+          date: selectedDate,
+          teamId: 1,
+          stickers: stickerTypes,
+        );
+        await controller.addNewDiaryEntry(entryToUpdate);
       } else {
-        final events = await _getEventsForDay(_selectedDay!);
-        _eventCache[normalizedDate] = events;
-        _selectedEvents.value = events;
+        // 기존 기록에 스티커 추가
+        final existingEntry = entries.first;
+        final updatedStickers = [...existingEntry.stickers, ...stickerTypes];
+        entryToUpdate = existingEntry.copyWith(stickers: updatedStickers);
+        await controller.updateDiaryEntry(entryToUpdate);
       }
-    }
-  }
-
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    if (!isSameDay(_selectedDay, selectedDay)) {
-      setState(() {
-        _selectedDay = selectedDay;
-        _focusedDay = focusedDay;
-      });
-      _loadEventsForSelectedDay();
+      
+      if (context.mounted) {
+        final message = entries.isEmpty 
+          ? '스티커와 함께 새 기록이 생성되었습니다'
+          : '스티커가 추가되었습니다';
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error adding sticker: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('스티커 추가에 실패했습니다'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -109,7 +89,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         alignment: Alignment.center,
         child: FaIcon(
           iconData,
-          size: size * 0.85, // FaIcon을 85%로 축소해서 Material Icon과 시각적 크기 맞춤
+          size: size * 0.85,
           color: color,
         ),
       );
@@ -123,13 +103,31 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildDayCell(BuildContext context, DateTime day, DateTime focusedDay) {
+  Widget _buildStickerIcon(StickerType stickerType, {required double size, Color? iconColor}) {
+    final color = iconColor ?? stickerType.color;
+    
+    if (stickerType.icon == FontAwesomeIcons.baseballBatBall) {
+      return FaIcon(
+        stickerType.icon,
+        size: size * 0.85,
+        color: color,
+      );
+    }
+    
+    return Icon(
+      stickerType.icon,
+      size: size,
+      color: color,
+    );
+  }
+
+  Widget _buildDayCell(BuildContext context, DateTime day, DateTime focusedDay, CalendarController controller) {
     final theme = Theme.of(context);
-    final entries = _getCachedEventsForDay(day);
+    final entries = controller.getCachedEventsForDay(day);
     
     return Container(
       margin: const EdgeInsets.all(6.0),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -140,7 +138,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               style: theme.textTheme.bodyMedium,
             ),
           ),
-          if (entries.isNotEmpty)
+          if (entries.isNotEmpty && entries.first.content.isNotEmpty)
             Positioned(
               top: 2,
               right: 2,
@@ -164,9 +162,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildSelectedDayCell(BuildContext context, DateTime day, DateTime focusedDay) {
+  Widget _buildSelectedDayCell(BuildContext context, DateTime day, DateTime focusedDay, CalendarController controller) {
     final theme = Theme.of(context);
-    final entries = _getCachedEventsForDay(day);
+    final entries = controller.getCachedEventsForDay(day);
     
     return Container(
       margin: const EdgeInsets.all(6.0),
@@ -185,7 +183,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
             ),
           ),
-          if (entries.isNotEmpty)
+          if (entries.isNotEmpty && entries.first.content.isNotEmpty)
             Positioned(
               top: 2,
               right: 2,
@@ -209,9 +207,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildTodayCell(BuildContext context, DateTime day, DateTime focusedDay) {
+  Widget _buildTodayCell(BuildContext context, DateTime day, DateTime focusedDay, CalendarController controller) {
     final theme = Theme.of(context);
-    final entries = _getCachedEventsForDay(day);
+    final entries = controller.getCachedEventsForDay(day);
     
     return Container(
       margin: const EdgeInsets.all(6.0),
@@ -230,7 +228,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
             ),
           ),
-          if (entries.isNotEmpty)
+          if (entries.isNotEmpty && entries.first.content.isNotEmpty)
             Positioned(
               top: 2,
               right: 2,
@@ -256,170 +254,238 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text(
-          '캘린더',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          // 캘린더 위젯
-          TableCalendar<DiaryEntry>(
-            firstDay: DateTime(2020),
-            lastDay: DateTime(2030),
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            eventLoader: _getCachedEventsForDay,
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
-                return _buildDayCell(context, day, focusedDay);
-              },
-              selectedBuilder: (context, day, focusedDay) {
-                return _buildSelectedDayCell(context, day, focusedDay);
-              },
-              todayBuilder: (context, day, focusedDay) {
-                return _buildTodayCell(context, day, focusedDay);
-              },
-            ),
-            availableCalendarFormats: const {
-              CalendarFormat.month: 'Month',
-              CalendarFormat.twoWeeks: '2 weeks',
-              CalendarFormat.week: 'Week',
-            },
-            calendarStyle: CalendarStyle(
-              outsideDaysVisible: false,
-              weekendTextStyle: TextStyle(color: theme.colorScheme.error),
-              holidayTextStyle: TextStyle(color: theme.colorScheme.error),
-              selectedDecoration: BoxDecoration(
-                color: theme.primaryColor,
-                shape: BoxShape.circle,
+    return Consumer<CalendarController>(
+        builder: (context, controller, child) {
+          if (!controller.isInitialized) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
               ),
-              todayDecoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.6),
-                shape: BoxShape.circle,
-              ),
-              markerDecoration: BoxDecoration(
-                color: theme.colorScheme.secondary,
-                shape: BoxShape.circle,
-              ),
-            ),
-            headerStyle: HeaderStyle(
-              formatButtonVisible: true,
-              titleCentered: true,
-              formatButtonShowsNext: false,
-              formatButtonDecoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              formatButtonTextStyle: TextStyle(
-                color: theme.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            onDaySelected: _onDaySelected,
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-              _loadCalendarData(); // Reload data for new month
-            },
-          ),
+            );
+          }
+
+          final theme = Theme.of(context);
           
-          const SizedBox(height: 8),
-          
-          // 선택된 날짜의 이벤트 목록
-          Expanded(
-            child: ValueListenableBuilder<List<DiaryEntry>>(
-              valueListenable: _selectedEvents,
-              builder: (context, entries, _) {
-                if (entries.isEmpty) {
-                  return Center(
-                    child: Text(
-                      '이 날짜에는 기록이 없습니다',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            appBar: AppBar(
+              title: const Text(
+                '캘린더',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            ),
+            body: Column(
+              children: [
+                // 캘린더 위젯
+                TableCalendar<DiaryEntry>(
+                  firstDay: DateTime(2020),
+                  lastDay: DateTime(2030),
+                  focusedDay: controller.focusedDay,
+                  calendarFormat: controller.calendarFormat,
+                  selectedDayPredicate: (day) {
+                    return isSameDay(controller.selectedDay, day);
+                  },
+                  eventLoader: controller.getCachedEventsForDay,
+                  calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (context, day, focusedDay) {
+                      return _buildDayCell(context, day, focusedDay, controller);
+                    },
+                    selectedBuilder: (context, day, focusedDay) {
+                      return _buildSelectedDayCell(context, day, focusedDay, controller);
+                    },
+                    todayBuilder: (context, day, focusedDay) {
+                      return _buildTodayCell(context, day, focusedDay, controller);
+                    },
+                  ),
+                  availableCalendarFormats: const {
+                    CalendarFormat.month: 'Month',
+                    CalendarFormat.twoWeeks: '2 weeks',
+                    CalendarFormat.week: 'Week',
+                  },
+                  calendarStyle: CalendarStyle(
+                    outsideDaysVisible: false,
+                    weekendTextStyle: TextStyle(color: theme.colorScheme.error),
+                    holidayTextStyle: TextStyle(color: theme.colorScheme.error),
+                    selectedDecoration: BoxDecoration(
+                      color: theme.primaryColor,
+                      shape: BoxShape.circle,
                     ),
-                  );
-                }
+                    todayDecoration: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
+                    markerDecoration: BoxDecoration(
+                      color: theme.colorScheme.secondary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: true,
+                    titleCentered: true,
+                    formatButtonShowsNext: false,
+                    formatButtonDecoration: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    formatButtonTextStyle: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onDaySelected: controller.onDaySelected,
+                  onFormatChanged: controller.onFormatChanged,
+                  onPageChanged: controller.onPageChanged,
+                ),
                 
-                return ListView.builder(
-                  itemCount: entries.length,
-                  itemBuilder: (context, index) {
-                    final entry = entries[index];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: theme.dividerColor),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        onTap: () => debugPrint('Tapped diary entry: ${entry.title}'),
-                        title: Text(entry.title),
-                        subtitle: entry.content.length > 50 
-                          ? Text('${entry.content.substring(0, 50)}...') 
-                          : Text(entry.content),
-                        leading: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: entry.emotion.color.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: _buildEmotionIcon(
-                            entry.emotion,
-                            size: 20,
-                            color: entry.emotion.color,
+                const SizedBox(height: 8),
+                
+                // 선택된 날짜의 이벤트 목록
+                Expanded(
+                  child: controller.selectedEvents.isEmpty
+                    ? Center(
+                        child: Text(
+                          '이 날짜에는 기록이 없습니다',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
-                        trailing: Text(
-                          entry.emotion.displayName,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: entry.emotion.color,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      )
+                    : ListView.builder(
+                        itemCount: controller.selectedEvents.length,
+                        itemBuilder: (context, index) {
+                          final entry = controller.selectedEvents[index];
+                          return Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: theme.dividerColor),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DiaryDetailScreen(entry: entry),
+                                  ),
+                                );
+                              },
+                              title: Text(entry.title),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (entry.content.isNotEmpty)
+                                    Text(
+                                      entry.content.length > 50 
+                                        ? '${entry.content.substring(0, 50)}...' 
+                                        : entry.content,
+                                    ),
+                                  if (entry.stickers.isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Wrap(
+                                      spacing: 4,
+                                      children: entry.stickers.map((stickerType) {
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: stickerType.color.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(color: stickerType.color.withValues(alpha: 0.3)),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              _buildStickerIcon(stickerType, size: 12),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                stickerType.displayName,
+                                                style: theme.textTheme.bodySmall?.copyWith(
+                                                  color: stickerType.color,
+                                                  fontSize: 10,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              leading: entry.content.isNotEmpty 
+                                ? Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: entry.emotion.color.withValues(alpha: 0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: _buildEmotionIcon(
+                                      entry.emotion,
+                                      size: 20,
+                                      color: entry.emotion.color,
+                                    ),
+                                  )
+                                : null,
+                              trailing: entry.content.isNotEmpty 
+                                ? Text(
+                                    entry.emotion.displayName,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: entry.emotion.color,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
+                                : null,
+                            ),
+                          );
+                        },
+                      ),
+                ),
+              ],
+            ),
+            
+            // 새 일기 추가 및 스티커 추가 플로팅 버튼
+            floatingActionButton: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton(
+                  heroTag: "sticker_fab",
+                  onPressed: () => _showStickerSelectionModal(context, controller),
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  child: const Icon(Icons.emoji_emotions),
+                ),
+                const SizedBox(height: 16),
+                FloatingActionButton(
+                  heroTag: "diary_fab",
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecordScreen(
+                          selectedDate: controller.selectedDay ?? DateTime.now(),
                         ),
                       ),
                     );
+                    
+                    if (result == true) {
+                      controller.refreshCalendar();
+                    }
                   },
-                );
-              },
+                  child: const Icon(Icons.add),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      
-      // 새 일기 추가 플로팅 버튼
-      floatingActionButton: FloatingActionButton(
-        heroTag: "calendar_fab",
-        onPressed: () {
-          // TODO: 일기 작성 화면으로 이동
-          debugPrint('Add new diary entry for ${_selectedDay?.toString()}');
+          );
         },
-        child: const Icon(Icons.add),
-      ),
     );
   }
+
 }

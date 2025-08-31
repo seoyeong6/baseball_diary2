@@ -1,4 +1,5 @@
 import 'emotion.dart';
+import 'sticker_data.dart';
 
 class DiaryEntry {
   final String id;
@@ -8,6 +9,7 @@ class DiaryEntry {
   final String? imagePath;
   final DateTime date;
   final int teamId;
+  final List<StickerType> stickers;
 
   const DiaryEntry({
     required this.id,
@@ -17,6 +19,7 @@ class DiaryEntry {
     this.imagePath,
     required this.date,
     required this.teamId,
+    this.stickers = const [],
   });
 
   Map<String, dynamic> toJson() {
@@ -28,6 +31,7 @@ class DiaryEntry {
       'imagePath': imagePath,
       'date': date.toIso8601String(),
       'teamId': teamId,
+      'stickers': stickers.map((s) => s.toJson()).toList(),
     };
   }
 
@@ -40,6 +44,9 @@ class DiaryEntry {
       imagePath: json['imagePath'] as String?,
       date: DateTime.parse(json['date'] as String),
       teamId: json['teamId'] as int,
+      stickers: (json['stickers'] as List<dynamic>?)
+          ?.map((s) => StickerType.fromJson(s as String))
+          .toList() ?? [],
     );
   }
 
@@ -51,6 +58,7 @@ class DiaryEntry {
     String? imagePath,
     DateTime? date,
     int? teamId,
+    List<StickerType>? stickers,
   }) {
     return DiaryEntry(
       id: id ?? this.id,
@@ -60,6 +68,7 @@ class DiaryEntry {
       imagePath: imagePath ?? this.imagePath,
       date: date ?? this.date,
       teamId: teamId ?? this.teamId,
+      stickers: stickers ?? this.stickers,
     );
   }
 
@@ -73,6 +82,6 @@ class DiaryEntry {
 
   @override
   String toString() {
-    return 'DiaryEntry{id: $id, title: $title, content: $content, emotion: $emotion, imagePath: $imagePath, date: $date, teamId: $teamId}';
+    return 'DiaryEntry{id: $id, title: $title, content: $content, emotion: $emotion, imagePath: $imagePath, date: $date, teamId: $teamId, stickers: $stickers}';
   }
 }

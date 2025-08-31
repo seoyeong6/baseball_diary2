@@ -175,7 +175,7 @@
           1,
           2
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -213,7 +213,7 @@
               "3.3"
             ],
             "details": "DiaryService에서 날짜별 기록 조회. 감정에 따른 아이콘을 캘린더 날짜에 표시",
-            "status": "in-progress"
+            "status": "done"
           },
           {
             "id": 5,
@@ -222,18 +222,18 @@
             "dependencies": [
               "3.4"
             ],
-            "details": "고정 스티커 세트 정의. 날짜별 스티커 표시. 스티커 선택 모달 구현",
-            "status": "pending"
+            "details": "고정 스티커 세트 정의. 날짜별 스티커 표시. 스티커 선택 모달 구현. 한번에 스티커를 여러개 선택하는 기능 구현. 스티커 삭제 기능은 상세보기 화면에서 구현 (기록 목록 onTap과 충돌 방지).",
+            "status": "done"
           },
           {
             "id": 6,
             "title": "날짜 클릭 네비게이션 구현",
-            "description": "날짜 클릭 시 기록 상세보기로 이동하는 기능 구현",
+            "description": "캘린더 기록 목록 클릭 시 상세보기로 이동하는 기능 구현",
             "dependencies": [
               "3.5"
             ],
-            "details": "날짜 클릭 이벤트 처리. 해당 날짜 기록이 있으면 상세보기로, 없으면 작성화면으로 이동",
-            "status": "pending"
+            "details": "날짜 클릭은 현재처럼 아래쪽 기록 목록 표시 유지. 기록 목록의 ListTile onTap 이벤트를 구현하여 상세보기 화면으로 네비게이션. 기록이 없는 날짜 클릭 시 기존처럼 처리",
+            "status": "done"
           },
           {
             "id": 7,
@@ -243,7 +243,7 @@
               "3.6"
             ],
             "details": "캘린더 상태, 선택된 날짜, 스티커 상태 관리. Provider나 Riverpod으로 상태 관리",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -257,7 +257,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -265,7 +265,7 @@
             "description": "이미지 선택 및 경로 관리를 위한 패키지 추가",
             "dependencies": [],
             "details": "image_picker: ^1.0.4, path_provider 패키지를 pubspec.yaml에 추가",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -275,7 +275,7 @@
               "4.1"
             ],
             "details": "StatefulWidget으로 RecordScreen 생성. main_navigation_screen.dart placeholder 교체",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 3,
@@ -285,7 +285,7 @@
               "4.2"
             ],
             "details": "제목용 TextField와 multiline 본문용 TextFormField 구현. Form validation 설정",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -295,7 +295,7 @@
               "4.3"
             ],
             "details": "감정별 아이콘과 텍스트가 있는 Card 위젯. SingleChildScrollView로 가로 스크롤 구현",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 5,
@@ -305,7 +305,7 @@
               "4.4"
             ],
             "details": "ImagePicker로 갤러리에서 1장만 선택. 선택된 사진 미리보기 및 삭제 기능",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 6,
@@ -315,7 +315,7 @@
               "4.5"
             ],
             "details": "제목 필수 입력 검증. path_provider로 이미지 저장. DiaryService를 통한 데이터 저장",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 7,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-31T05:08:12.194Z",
+      "updated": "2025-08-31T22:34:06.629Z",
       "description": "Tasks for master context"
     }
   }

@@ -51,7 +51,15 @@ enum StickerType {
 
   // 카테고리별 스티커 타입 반환
   static List<StickerType> getGameRelatedTypes() {
-    return [StickerType.watch, StickerType.victory, StickerType.defeat, StickerType.draw];
+    return [
+      StickerType.watch, 
+      StickerType.victory, 
+      StickerType.defeat, 
+      StickerType.draw,
+      StickerType.homerun,
+      StickerType.strikeout,
+      StickerType.steal,
+    ];
   }
 
   static List<StickerType> getActivityTypes() {

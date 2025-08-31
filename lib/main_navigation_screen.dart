@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:baseball_diary2/widgets/nav_tab.dart';
 import 'package:baseball_diary2/home_screen/home_screen.dart';
 import 'package:baseball_diary2/screens/calendar_screen.dart';
+import 'package:baseball_diary2/screens/record_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -17,7 +18,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final screens = [
     const CalendarScreen(),
     Center(child: Text('Recent Diary Entries')),
-    Center(child: Text('Record')),
+    const RecordScreen(),
     Center(child: Text('Graphs')),
     Center(child: Text('Settings')),
   ];
