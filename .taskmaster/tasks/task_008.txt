@@ -19,9 +19,9 @@ StatefulWidget으로 SettingsScreen 생성. main_navigation_screen.dart placehol
 
 ## 2. 다크모드 토글 기능 구현 [pending]
 ### Dependencies: 8.1
-### Description: 다크모드 on/off 토글 스위치 기능 추가
+### Description: 완전한 다크모드 시스템 구현 - 테마 상태 관리, 저장/불러오기, 시스템 테마 감지 포함
 ### Details:
-Switch 위젯으로 다크모드 토글. 설정 변경 사항 즉시 반영
+1. ThemeProvider 또는 ThemeNotifier 상태 관리 클래스 구현 2. 라이트/다크 ColorScheme을 기존 themes.dart에 정의 3. SharedPreferences로 테마 설정 저장/불러오기 4. 시스템 테마 변경 감지 (MediaQuery.platformBrightnessOf) 5. MaterialApp에서 테마 동적 적용 6. 설정 화면에 토글 스위치 UI 구현 7. 테마 변경 시 즉시 앱 전체 반영
 
 ## 3. 응원팀 변경 기능 구현 [pending]
 ### Dependencies: 8.2

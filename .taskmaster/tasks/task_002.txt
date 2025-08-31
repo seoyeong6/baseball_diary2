@@ -11,25 +11,25 @@
 구단 선택 UI 렌더링 테스트, 저장/불러오기 기능 테스트, 최초 실행 감지 로직 테스트
 
 # Subtasks:
-## 1. TeamSelectionScreen 위젯 생성 [pending]
+## 1. TeamSelectionScreen 위젯 생성 [done]
 ### Dependencies: None
 ### Description: 구단 선택을 위한 화면 위젯 기본 구조 생성
 ### Details:
 StatefulWidget으로 TeamSelectionScreen 클래스 생성. lib/screens/ 디렉토리에 배치
 
-## 2. 구단 에셋 추가 [pending]
+## 2. 구단 에셋 추가 [done]
 ### Dependencies: None
 ### Description: 10개 KBO 구단 로고 이미지를 assets에 추가
 ### Details:
 assets/images/teams/ 폴더에 각 구단별 로고 이미지 추가. pubspec.yaml에 assets 경로 등록
 
-## 3. GridView 구단 선택 UI 구성 [pending]
+## 3. GridView 구단 선택 UI 구성 [done]
 ### Dependencies: 2.1, 2.2
 ### Description: 2x5 그리드 형태의 구단 선택 UI 구현
 ### Details:
 GridView.builder로 각 구단 카드 표시. 팀 색상과 로고를 적용한 Card 위젯 구성
 
-## 4. 구단 선택 애니메이션 구현 [pending]
+## 4. 구단 선택 애니메이션 구현 [done]
 ### Dependencies: 2.3
 ### Description: 구단 선택 시 시각적 피드백을 위한 애니메이션 추가
 ### Details:

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/team.dart';
+import '../main_navigation_screen.dart';
+import '../services/team_selection_helper.dart';
 
 /// 최초 실행 시 사용자가 좋아하는 KBO 구단을 선택하는 화면
 class TeamSelectionScreen extends StatefulWidget {
@@ -11,6 +13,7 @@ class TeamSelectionScreen extends StatefulWidget {
 
 class _TeamSelectionScreenState extends State<TeamSelectionScreen> {
   Team? _selectedTeam;
+  bool _isLoading = false;
 
   void _selectTeam(Team team) {
     setState(() {
@@ -18,16 +21,47 @@ class _TeamSelectionScreenState extends State<TeamSelectionScreen> {
     });
   }
 
-  void _confirmSelection() {
-    if (_selectedTeam != null) {
-      // TODO: 선택된 팀 저장 로직 추가 (Task 2.5에서 구현)
-      // TODO: 메인 화면으로 이동 (Task 2.6에서 구현)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${_selectedTeam!.name}를 선택했습니다!'),
-          duration: const Duration(seconds: 1),
-        ),
-      );
+  Future<void> _confirmSelection() async {
+    if (_selectedTeam == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await TeamSelectionHelper.saveSelectedTeam(_selectedTeam!);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_selectedTeam!.name}를 선택했습니다!'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+
+        await Future.delayed(const Duration(seconds: 1));
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const MainNavigationScreen(),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('저장 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -98,7 +132,7 @@ class _TeamSelectionScreenState extends State<TeamSelectionScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: _selectedTeam != null ? _confirmSelection : null,
+                onPressed: _selectedTeam != null && !_isLoading ? _confirmSelection : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primaryColor,
                   foregroundColor: theme.colorScheme.onPrimary,
@@ -108,15 +142,24 @@ class _TeamSelectionScreenState extends State<TeamSelectionScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: Text(
-                  _selectedTeam != null 
-                      ? '${_selectedTeam!.name} 선택하기'
-                      : '구단을 선택해주세요',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: _isLoading 
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text(
+                        _selectedTeam != null 
+                            ? '${_selectedTeam!.name} 선택하기'
+                            : '구단을 선택해주세요',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ),

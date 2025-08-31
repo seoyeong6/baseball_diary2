@@ -4,12 +4,12 @@
       {
         "id": 1,
         "title": "데이터 모델 및 서비스 설계 구현",
-        "description": "야구팀, 감정, 기록, 스티커 데이터 모델과 Firestore/로컬 DB 연동 서비스 클래스 구현",
-        "details": "1. 10개 KBO 구단 데이터 모델 생성 (팀명, 색상, 로고 포함) 2. DiaryEntry 모델 정의 (제목, 본문, 감정, 사진경로, 날짜) 3. Emotion enum 정의 (5-7개 감정 상태) 4. StickerData 모델 정의 5. DiaryService 클래스 구현 - Firestore와 SharedPreferences 양방향 지원 6. FirebaseService와 LocalStorageService 분리 구현 7. 기존 AuthService와 연동하여 로그인/비로그인 모드 지원",
+        "description": "야구팀, 감정, 기록, 스티커 데이터 모델과 로컬 DB 서비스 클래스 구현 (MVP)",
+        "details": "1. 10개 KBO 구단 데이터 모델 생성 (팀명, 색상, 로고 포함) 2. DiaryEntry 모델 정의 (제목, 본문, 감정, 사진경로, 날짜) 3. Emotion enum 정의 (5-7개 감정 상태) 4. StickerData 모델 정의 5. DiaryService 클래스 구현 - LocalStorageService 사용 6. MVP로 로컬 저장만 구현 7. AuthService 연동은 향후 확장시 적용",
         "testStrategy": "각 모델의 toJson/fromJson 테스트, 서비스 클래스의 CRUD 동작 테스트, 네트워크 연결 없이 로컬 모드 테스트",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -76,7 +76,7 @@
               "1.6"
             ],
             "details": "AuthService와 연동하여 로그인 상태에 따라 로컬/클라우드 저장 분기 처리",
-            "status": "in-progress"
+            "status": "done"
           },
           {
             "id": 8,
@@ -97,13 +97,13 @@
         "id": 2,
         "title": "구단 선택 화면 구현",
         "description": "최초 실행 시 나타나는 10개 KBO 구단 선택 UI와 로직 구현",
-        "details": "1. TeamSelectionScreen 위젯 생성 2. 10개 KBO 구단 데이터와 색상/로고 에셋 추가 3. GridView.builder로 2x5 구단 선택 UI 구성 4. 각 구단 카드에 팀 색상과 로고 적용 5. 선택 시 애니메이션 효과 추가 6. 선택된 팀을 SharedPreferences와 Firestore에 저장 7. 최초 실행 여부 확인 로직 구현 8. main.dart에서 팀 선택 여부에 따른 화면 분기 처리",
+        "details": "1. TeamSelectionScreen 위젯 생성 2. 10개 KBO 구단 데이터와 색상/로고 에셋 추가 3. GridView.builder로 2x5 구단 선택 UI 구성 4. 각 구단 카드에 팀 색상과 로고 적용 5. 선택 시 애니메이션 효과 추가 6. 선택된 팀을 SharedPreferences에 저장 (MVP - 로컬만) 7. 최초 실행 여부 확인 로직 구현 8. main.dart에서 팀 선택 여부에 따른 화면 분기 처리",
         "testStrategy": "구단 선택 UI 렌더링 테스트, 저장/불러오기 기능 테스트, 최초 실행 감지 로직 테스트",
         "priority": "high",
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -145,12 +145,12 @@
           {
             "id": 5,
             "title": "선택된 팀 저장 기능 구현",
-            "description": "선택된 구단을 로컬 및 클라우드에 저장하는 기능 구현",
+            "description": "선택된 구단을 로컬에 저장하는 기능 구현 (MVP - 로컬 저장만)",
             "dependencies": [
               "2.4"
             ],
-            "details": "SharedPreferences와 향후 Firestore에 선택된 teamId 저장. DiaryService를 통한 저장",
-            "status": "pending"
+            "details": "SharedPreferences로 선택된 teamId 저장. MVP로 로컬 저장만 구현",
+            "status": "done"
           },
           {
             "id": 6,
@@ -160,7 +160,7 @@
               "2.5"
             ],
             "details": "main.dart에서 팀 선택 여부 확인 후 TeamSelection 또는 MainNavigation으로 분기",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -175,7 +175,7 @@
           1,
           2
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -183,7 +183,7 @@
             "description": "table_calendar 패키지를 pubspec.yaml에 추가",
             "dependencies": [],
             "details": "table_calendar: ^3.0.9 패키지 추가 및 flutter pub get 실행",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -193,7 +193,7 @@
               "3.1"
             ],
             "details": "StatefulWidget으로 CalendarScreen 생성. main_navigation_screen.dart placeholder 교체",
-            "status": "pending"
+            "status": "in-progress"
           },
           {
             "id": 3,
@@ -251,7 +251,7 @@
         "id": 4,
         "title": "기록 작성 탭 구현",
         "description": "제목, 본문, 감정, 사진을 포함한 일기 작성 화면과 저장 기능 구현",
-        "details": "1. RecordScreen 위젯 생성하여 main_navigation_screen.dart의 placeholder 교체 2. image_picker: ^1.0.4 패키지 추가 3. 제목 입력 TextField 4. 본문 입력 TextFormField (multiline) 5. 감정 선택 UI: 5-7개 감정을 가로 스크롤 가능한 Row로 배치 6. 사진 첨부 기능: ImagePicker로 갤러리에서 1장만 선택 7. 선택된 사진 미리보기와 삭제 기능 8. 저장 버튼과 유효성 검증 (제목 필수) 9. 저장 시 DiaryService를 통해 Firestore/로컬 DB에 저장 10. path_provider로 이미지 로컬 저장 경로 관리",
+        "details": "1. RecordScreen 위젯 생성하여 main_navigation_screen.dart의 placeholder 교체 2. image_picker: ^1.0.4 패키지 추가 3. 제목 입력 TextField 4. 본문 입력 TextFormField (multiline) 5. 감정 선택 UI: 5-7개 감정을 가로 스크롤 가능한 Row로 배치 6. 사진 첨부 기능: ImagePicker로 갤러리에서 1장만 선택 7. 선택된 사진 미리보기와 삭제 기능 8. 저장 버튼과 유효성 검증 (제목 필수) 9. 저장 시 LocalStorageService를 통해 로컬 DB에 저장 (MVP) 10. path_provider로 이미지 로컬 저장 경로 관리",
         "testStrategy": "폼 유효성 검증 테스트, 이미지 선택/저장 테스트, 기록 저장 기능 테스트, 1장 제한 로직 테스트",
         "priority": "high",
         "dependencies": [
@@ -581,11 +581,11 @@
           {
             "id": 2,
             "title": "다크모드 토글 기능 구현",
-            "description": "다크모드 on/off 토글 스위치 기능 추가",
+            "description": "완전한 다크모드 시스템 구현 - 테마 상태 관리, 저장/불러오기, 시스템 테마 감지 포함",
             "dependencies": [
               "8.1"
             ],
-            "details": "Switch 위젯으로 다크모드 토글. 설정 변경 사항 즉시 반영",
+            "details": "1. ThemeProvider 또는 ThemeNotifier 상태 관리 클래스 구현 2. 라이트/다크 ColorScheme을 기존 themes.dart에 정의 3. SharedPreferences로 테마 설정 저장/불러오기 4. 시스템 테마 변경 감지 (MediaQuery.platformBrightnessOf) 5. MaterialApp에서 테마 동적 적용 6. 설정 화면에 토글 스위치 UI 구현 7. 테마 변경 시 즉시 앱 전체 반영",
             "status": "pending"
           },
           {
@@ -630,7 +630,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "deferred",
         "subtasks": [
           {
             "id": 1,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-29T22:10:46.436Z",
+      "updated": "2025-08-31T00:55:24.513Z",
       "description": "Tasks for master context"
     }
   }
