@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 enum Emotion {
   excited('excited', 'assets/images/emotions/excited.png', '흥분', Colors.orange),
@@ -64,18 +65,17 @@ extension EmotionExtension on Emotion {
     }
   }
 
-
   // 감정에 따른 아이콘 (PNG 파일을 사용할 수 없는 경우의 대체재)
   IconData get fallbackIcon {
     switch (this) {
+      case Emotion.excited:
+        return FontAwesomeIcons.faceGrinSquint;
       case Emotion.happy:
         return Icons.sentiment_very_satisfied;
-      case Emotion.excited:
-        return Icons.celebration;
       case Emotion.neutral:
         return Icons.sentiment_neutral;
       case Emotion.sad:
-        return Icons.sentiment_very_dissatisfied;
+        return FontAwesomeIcons.faceSadTear;
       case Emotion.angry:
         return Icons.sentiment_very_dissatisfied;
     }

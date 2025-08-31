@@ -213,7 +213,7 @@
               "3.3"
             ],
             "details": "DiaryService에서 날짜별 기록 조회. 감정에 따른 아이콘을 캘린더 날짜에 표시",
-            "status": "pending"
+            "status": "in-progress"
           },
           {
             "id": 5,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-31T03:26:42.861Z",
+      "updated": "2025-08-31T05:08:12.194Z",
       "description": "Tasks for master context"
     }
   }
