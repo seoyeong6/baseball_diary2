@@ -70,43 +70,43 @@ class KBOTeams {
       id: 4,
       name: 'SSG 랜더스',
       logoPath: 'lib/assets/images/teams/ssg_landers.png',
-      primaryColor: Color(0xFF1E3A8A), // SSG 랜더스 파랑
+      primaryColor: Color(0xFFce0e2d), // SSG 랜더스 파랑
     ),
     Team(
       id: 5,
       name: 'NC 다이노스',
       logoPath: 'lib/assets/images/teams/nc_dinos.png',
-      primaryColor: Color(0xFF1E40AF), // NC 다이노스 네이비
+      primaryColor: Color(0xff315288), // NC 다이노스 네이비
     ),
     Team(
       id: 6,
       name: '두산 베어스',
       logoPath: 'lib/assets/images/teams/doosan_bears.png',
-      primaryColor: Color(0xFF1E3A8A), // 두산 베어스 파랑
+      primaryColor: Color(0xFF1A1748), // 두산 베어스 파랑
     ),
     Team(
       id: 7,
       name: 'KIA 타이거즈',
       logoPath: 'lib/assets/images/teams/kia_tigers.png',
-      primaryColor: Color(0xFFDC2626), // KIA 타이거즈 빨강
+      primaryColor: Color(0xFFEA0029), // KIA 타이거즈 빨강
     ),
     Team(
       id: 8,
       name: '롯데 자이언츠',
       logoPath: 'lib/assets/images/teams/lotte_giants.png',
-      primaryColor: Color(0xFF1E40AF), // 롯데 자이언츠 네이비
+      primaryColor: Color(0xFF041E42), // 롯데 자이언츠 네이비
     ),
     Team(
       id: 9,
       name: '삼성 라이온즈',
       logoPath: 'lib/assets/images/teams/samsung_lions.png',
-      primaryColor: Color(0xFF1E40AF), // 삼성 라이온즈 파랑
+      primaryColor: Color(0xFF074CA1), // 삼성 라이온즈 파랑
     ),
     Team(
       id: 10,
       name: '한화 이글스',
       logoPath: 'lib/assets/images/teams/hanhwa-eagles.png',
-      primaryColor: Color(0xFFEA580C), // 한화 이글스 주황
+      primaryColor: Color(0xFFFC4E00), // 한화 이글스 주황
     ),
   ];
 
