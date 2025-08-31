@@ -4,6 +4,7 @@ import 'package:baseball_diary2/main_navigation_screen.dart';
 import 'package:baseball_diary2/screens/team_selection_screen.dart';
 import 'package:baseball_diary2/services/auth_service.dart';
 import 'package:baseball_diary2/services/team_selection_helper.dart';
+import 'package:baseball_diary2/models/team.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,16 +12,52 @@ void main() async {
   runApp(const BaseballDiaryApp());
 }
 
-class BaseballDiaryApp extends StatelessWidget {
+class BaseballDiaryApp extends StatefulWidget {
   const BaseballDiaryApp({super.key});
 
   @override
+  State<BaseballDiaryApp> createState() => _BaseballDiaryAppState();
+}
+
+class _BaseballDiaryAppState extends State<BaseballDiaryApp> {
+  Color _currentColorSeed = Colors.black;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTeamColor();
+  }
+
+  Future<void> _loadTeamColor() async {
+    try {
+      final selectedTeam = await TeamSelectionHelper.getSelectedTeam();
+      if (selectedTeam != null && mounted) {
+        setState(() {
+          _currentColorSeed = selectedTeam.primaryColor;
+        });
+      }
+    } catch (e) {
+      // 팀 정보를 불러올 수 없으면 기본 색상 유지
+    }
+  }
+
+  void updateTeamColor(Color newColor) {
+    if (mounted) {
+      setState(() {
+        _currentColorSeed = newColor;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final themes = Themes(colorSeed: _currentColorSeed);
+    
     return MaterialApp(
       title: 'Baseball Diary',
-      home: const AppInitializer(),
-      theme: Themes().lightTheme,
-      darkTheme: Themes().darkTheme,
+      home: AppInitializer(onTeamChanged: updateTeamColor),
+      theme: themes.lightTheme,
+      darkTheme: themes.darkTheme,
       themeMode: ThemeMode.system,
     );
   }
@@ -28,7 +65,9 @@ class BaseballDiaryApp extends StatelessWidget {
 
 /// 앱 초기화 및 라우팅을 담당하는 위젯
 class AppInitializer extends StatefulWidget {
-  const AppInitializer({super.key});
+  final Function(Color) onTeamChanged;
+  
+  const AppInitializer({super.key, required this.onTeamChanged});
 
   @override
   State<AppInitializer> createState() => _AppInitializerState();
@@ -53,7 +92,11 @@ class _AppInitializerState extends State<AppInitializer> {
         if (hasSelectedTeam) {
           return const MainNavigationScreen();
         } else {
-          return const TeamSelectionScreen();
+          return TeamSelectionScreen(
+            onTeamSelected: (team) {
+              widget.onTeamChanged(team.primaryColor);
+            },
+          );
         }
       },
     );

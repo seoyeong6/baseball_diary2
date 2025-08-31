@@ -35,23 +35,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: [
           Offstage(
             offstage: _selectedIndex != 0,
-            child: screens[_selectedIndex],
+            child: screens[0],
           ),
           Offstage(
             offstage: _selectedIndex != 1,
-            child: screens[_selectedIndex],
+            child: screens[1],
           ),
           Offstage(
             offstage: _selectedIndex != 2,
-            child: screens[_selectedIndex],
+            child: screens[2],
           ),
           Offstage(
             offstage: _selectedIndex != 3,
-            child: screens[_selectedIndex],
+            child: screens[3],
           ),
           Offstage(
             offstage: _selectedIndex != 4,
-            child: screens[_selectedIndex],
+            child: screens[4],
           ),
         ],
       ),

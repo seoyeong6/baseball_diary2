@@ -193,7 +193,7 @@
               "3.1"
             ],
             "details": "StatefulWidget으로 CalendarScreen 생성. main_navigation_screen.dart placeholder 교체",
-            "status": "in-progress"
+            "status": "done"
           },
           {
             "id": 3,
@@ -203,7 +203,7 @@
               "3.2"
             ],
             "details": "TableCalendar 위젯 설정. 팀 색상 테마 적용. 기본 캘린더 기능 구현",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-31T00:55:24.513Z",
+      "updated": "2025-08-31T03:26:42.861Z",
       "description": "Tasks for master context"
     }
   }

@@ -163,6 +163,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       
       // 새 일기 추가 플로팅 버튼
       floatingActionButton: FloatingActionButton(
+        heroTag: "calendar_fab",
         onPressed: () {
           // TODO: 일기 작성 화면으로 이동
           debugPrint('Add new diary entry for ${_selectedDay?.toString()}');

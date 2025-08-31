@@ -1,12 +1,16 @@
+import 'package:flutter/material.dart';
+
 class Team {
   final int id;
   final String name;
   final String logoPath;
+  final Color primaryColor;
 
   const Team({
     required this.id,
     required this.name,
     required this.logoPath,
+    required this.primaryColor,
   });
 
   Map<String, dynamic> toJson() {
@@ -14,6 +18,7 @@ class Team {
       'id': id,
       'name': name,
       'logoPath': logoPath,
+      'primaryColor': primaryColor.value,
     };
   }
 
@@ -22,6 +27,7 @@ class Team {
       id: json['id'] as int,
       name: json['name'] as String,
       logoPath: json['logoPath'] as String,
+      primaryColor: Color(json['primaryColor'] as int),
     );
   }
 
@@ -46,51 +52,61 @@ class KBOTeams {
       id: 1,
       name: 'LG 트윈스',
       logoPath: 'lib/assets/images/teams/lg_twins.png',
+      primaryColor: Color(0xFFC30452), // LG 트윈스 핑크
     ),
     Team(
       id: 2,
       name: '키움 히어로즈',
       logoPath: 'lib/assets/images/teams/kiwoom_heroes.png',
+      primaryColor: Color(0xFF570514), // 키움 히어로즈 보라
     ),
     Team(
       id: 3,
       name: 'KT 위즈',
       logoPath: 'lib/assets/images/teams/kt_wiz.png',
+      primaryColor: Color(0xFF000000), // KT 위즈 검정
     ),
     Team(
       id: 4,
       name: 'SSG 랜더스',
       logoPath: 'lib/assets/images/teams/ssg_landers.png',
+      primaryColor: Color(0xFF1E3A8A), // SSG 랜더스 파랑
     ),
     Team(
       id: 5,
       name: 'NC 다이노스',
       logoPath: 'lib/assets/images/teams/nc_dinos.png',
+      primaryColor: Color(0xFF1E40AF), // NC 다이노스 네이비
     ),
     Team(
       id: 6,
       name: '두산 베어스',
       logoPath: 'lib/assets/images/teams/doosan_bears.png',
+      primaryColor: Color(0xFF1E3A8A), // 두산 베어스 파랑
     ),
     Team(
       id: 7,
       name: 'KIA 타이거즈',
       logoPath: 'lib/assets/images/teams/kia_tigers.png',
+      primaryColor: Color(0xFFDC2626), // KIA 타이거즈 빨강
     ),
     Team(
       id: 8,
       name: '롯데 자이언츠',
       logoPath: 'lib/assets/images/teams/lotte_giants.png',
+      primaryColor: Color(0xFF1E40AF), // 롯데 자이언츠 네이비
     ),
     Team(
       id: 9,
       name: '삼성 라이온즈',
       logoPath: 'lib/assets/images/teams/samsung_lions.png',
+      primaryColor: Color(0xFF1E40AF), // 삼성 라이온즈 파랑
     ),
     Team(
       id: 10,
       name: '한화 이글스',
       logoPath: 'lib/assets/images/teams/hanhwa-eagles.png',
+      primaryColor: Color(0xFFEA580C), // 한화 이글스 주황
     ),
   ];
 

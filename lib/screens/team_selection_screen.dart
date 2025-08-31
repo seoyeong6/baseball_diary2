@@ -5,7 +5,9 @@ import '../services/team_selection_helper.dart';
 
 /// 최초 실행 시 사용자가 좋아하는 KBO 구단을 선택하는 화면
 class TeamSelectionScreen extends StatefulWidget {
-  const TeamSelectionScreen({super.key});
+  final Function(Team)? onTeamSelected;
+  
+  const TeamSelectionScreen({super.key, this.onTeamSelected});
 
   @override
   State<TeamSelectionScreen> createState() => _TeamSelectionScreenState();
@@ -30,6 +32,9 @@ class _TeamSelectionScreenState extends State<TeamSelectionScreen> {
 
     try {
       await TeamSelectionHelper.saveSelectedTeam(_selectedTeam!);
+      
+      // 팀 색상 콜백 호출
+      widget.onTeamSelected?.call(_selectedTeam!);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

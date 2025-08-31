@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 class Themes {
-  Themes();
-
-  // colorSeed를 고정값(검정색)으로 지정
-  final Color colorSeed = Colors.black;
+  final Color colorSeed;
+  
+  Themes({this.colorSeed = Colors.black});
 
   ThemeData get _baseLightTheme => ThemeData(
     useMaterial3: true,
