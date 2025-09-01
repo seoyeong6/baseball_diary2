@@ -56,7 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
-    
+
     if (result != null) {
       _loadSettings();
     }
@@ -70,24 +70,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       final diaryService = DiaryService();
       await diaryService.initialize();
-      
+
       final backupData = await diaryService.createDataBackup();
       final jsonString = const JsonEncoder.withIndent('  ').convert(backupData);
-      
+
       final directory = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
       final fileName = 'baseball_diary_backup_$timestamp.json';
       final filePath = '${directory.path}/$fileName';
-      
+
       final file = File(filePath);
       await file.writeAsString(jsonString);
-      
+
       await Share.shareXFiles(
         [XFile(filePath)],
         text: '야구 다이어리 백업 데이터',
         subject: '야구 다이어리 데이터 백업',
       );
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -118,179 +118,144 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           '설정',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
         children: [
-          // 테마 설정
-          _buildSettingCard(
-            context,
-            title: '테마 설정',
-            children: [
-              Consumer<ThemeController>(
-                builder: (context, themeController, child) {
-                  return Column(
-                    children: [
-                      RadioListTile<ThemeMode>(
-                        title: const Text('시스템 설정 따라가기'),
-                        subtitle: const Text('기기의 다크모드 설정을 따름'),
-                        value: ThemeMode.system,
-                        groupValue: themeController.themeMode,
-                        onChanged: (value) {
-                          if (value != null) {
-                            themeController.setThemeMode(value);
-                          }
-                        },
-                      ),
-                      RadioListTile<ThemeMode>(
-                        title: const Text('라이트 모드'),
-                        subtitle: const Text('밝은 테마 사용'),
-                        value: ThemeMode.light,
-                        groupValue: themeController.themeMode,
-                        onChanged: (value) {
-                          if (value != null) {
-                            themeController.setThemeMode(value);
-                          }
-                        },
-                      ),
-                      RadioListTile<ThemeMode>(
-                        title: const Text('다크 모드'),
-                        subtitle: const Text('어두운 테마 사용'),
-                        value: ThemeMode.dark,
-                        groupValue: themeController.themeMode,
-                        onChanged: (value) {
-                          if (value != null) {
-                            themeController.setThemeMode(value);
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ],
+          // 테마 설정 섹션
+          _buildSectionHeader(context, '테마 설정'),
+          Consumer<ThemeController>(
+            builder: (context, themeController, child) {
+              return Column(
+                children: [
+                  RadioListTile<ThemeMode>(
+                    title: const Text('시스템 설정 따라가기'),
+                    subtitle: const Text('기기의 다크모드 설정을 따름'),
+                    value: ThemeMode.system,
+                    groupValue: themeController.themeMode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        themeController.setThemeMode(value);
+                      }
+                    },
+                  ),
+                  RadioListTile<ThemeMode>(
+                    title: const Text('라이트 모드'),
+                    subtitle: const Text('밝은 테마 사용'),
+                    value: ThemeMode.light,
+                    groupValue: themeController.themeMode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        themeController.setThemeMode(value);
+                      }
+                    },
+                  ),
+                  RadioListTile<ThemeMode>(
+                    title: const Text('다크 모드'),
+                    subtitle: const Text('어두운 테마 사용'),
+                    value: ThemeMode.dark,
+                    groupValue: themeController.themeMode,
+                    onChanged: (value) {
+                      if (value != null) {
+                        themeController.setThemeMode(value);
+                      }
+                    },
+                  ),
+                ],
+              );
+            },
           ),
-          
-          const SizedBox(height: 16),
-          
-          // 팀 설정
-          _buildSettingCard(
-            context,
-            title: '응원팀',
-            children: [
-              ListTile(
-                title: const Text('선택된 팀'),
-                subtitle: Text(_selectedTeam?.name ?? '팀을 선택해주세요'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_selectedTeam != null)
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: _selectedTeam!.primaryColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.chevron_right),
-                  ],
-                ),
-                onTap: _changeTeam,
-              ),
-            ],
+
+          _buildDivider(context),
+
+          // 응원팀 섹션
+          _buildSectionHeader(context, '응원팀'),
+          ListTile(
+            title: const Text('선택된 팀'),
+            subtitle: Text(_selectedTeam?.name ?? '팀을 선택해주세요'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_selectedTeam != null)
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: _selectedTeam!.primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                const SizedBox(width: 8),
+                const Icon(Icons.chevron_right),
+              ],
+            ),
+            onTap: _changeTeam,
           ),
-          
-          const SizedBox(height: 16),
-          
-          // 데이터 관리
-          _buildSettingCard(
-            context,
-            title: '데이터 관리',
-            children: [
-              ListTile(
-                title: const Text('데이터 내보내기'),
-                subtitle: const Text('기록을 JSON 파일로 백업'),
-                trailing: const Icon(Icons.download),
-                onTap: _exportData,
-              ),
-            ],
+
+          _buildDivider(context),
+
+          // 데이터 관리 섹션
+          _buildSectionHeader(context, '데이터 관리'),
+          ListTile(
+            title: const Text('데이터 내보내기'),
+            subtitle: const Text('기록을 JSON 파일로 백업'),
+            trailing: const Icon(Icons.download),
+            onTap: _exportData,
           ),
-          
-          const SizedBox(height: 16),
-          
-          // 앱 정보
-          _buildSettingCard(
-            context,
-            title: '앱 정보',
-            children: [
-              const ListTile(
-                title: Text('버전'),
-                subtitle: Text('1.0.0'),
-                trailing: Icon(Icons.info_outline),
-              ),
-              const ListTile(
-                title: Text('개발자'),
-                subtitle: Text('Baseball Diary Team'),
-                trailing: Icon(Icons.person_outline),
-              ),
-            ],
+
+          _buildDivider(context),
+
+          // 앱 정보 섹션
+          _buildSectionHeader(context, '앱 정보'),
+          const ListTile(
+            title: Text('버전'),
+            subtitle: Text('1.0.0'),
+            trailing: Icon(Icons.info_outline),
+          ),
+          const ListTile(
+            title: Text('개발자'),
+            subtitle: Text('Baseball Diary Team'),
+            trailing: Icon(Icons.person_outline),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingCard(BuildContext context, {
-    required String title,
-    required List<Widget> children,
-  }) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     final theme = Theme.of(context);
     
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.dividerColor),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Text(
+        title,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          ...children,
-        ],
-      ),
+    );
+  }
+
+  Widget _buildDivider(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: Theme.of(context).dividerColor,
     );
   }
 }
