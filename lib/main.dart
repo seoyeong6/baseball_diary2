@@ -6,6 +6,7 @@ import 'package:baseball_diary2/screens/team_selection_screen.dart';
 import 'package:baseball_diary2/services/auth_service.dart';
 import 'package:baseball_diary2/services/team_selection_helper.dart';
 import 'package:baseball_diary2/controllers/calendar_controller.dart';
+import 'package:baseball_diary2/controllers/theme_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,14 +55,21 @@ class _BaseballDiaryAppState extends State<BaseballDiaryApp> {
   Widget build(BuildContext context) {
     final themes = Themes(colorSeed: _currentColorSeed);
     
-    return ChangeNotifierProvider(
-      create: (context) => CalendarController(),
-      child: MaterialApp(
-        title: 'Baseball Diary',
-        home: AppInitializer(onTeamChanged: updateTeamColor),
-        theme: themes.lightTheme,
-        darkTheme: themes.darkTheme,
-        themeMode: ThemeMode.system,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CalendarController()),
+        ChangeNotifierProvider(create: (context) => ThemeController()),
+      ],
+      child: Consumer<ThemeController>(
+        builder: (context, themeController, child) {
+          return MaterialApp(
+            title: 'Baseball Diary',
+            home: AppInitializer(onTeamChanged: updateTeamColor),
+            theme: themes.lightTheme,
+            darkTheme: themes.darkTheme,
+            themeMode: themeController.themeMode,
+          );
+        },
       ),
     );
   }

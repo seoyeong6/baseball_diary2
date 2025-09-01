@@ -257,7 +257,7 @@
         "dependencies": [
           1
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -325,7 +325,7 @@
               "4.6"
             ],
             "details": "폼 유효성 검증, 이미지 선택, 저장 기능에 대한 테스트 작성",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -568,7 +568,7 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -576,7 +576,7 @@
             "description": "설정 화면 위젯 기본 구조 생성",
             "dependencies": [],
             "details": "StatefulWidget으로 SettingsScreen 생성. main_navigation_screen.dart placeholder 교체",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -586,7 +586,7 @@
               "8.1"
             ],
             "details": "1. ThemeProvider 또는 ThemeNotifier 상태 관리 클래스 구현 2. 라이트/다크 ColorScheme을 기존 themes.dart에 정의 3. SharedPreferences로 테마 설정 저장/불러오기 4. 시스템 테마 변경 감지 (MediaQuery.platformBrightnessOf) 5. MaterialApp에서 테마 동적 적용 6. 설정 화면에 토글 스위치 UI 구현 7. 테마 변경 시 즉시 앱 전체 반영",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 3,
@@ -596,7 +596,7 @@
               "8.2"
             ],
             "details": "현재 팀 표시. 팀 변경 시 TeamSelectionScreen 재사용. 변경 사항 저장",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -606,7 +606,7 @@
               "8.3"
             ],
             "details": "share_plus: ^7.2.1 패키지로 데이터 내보내기. JSON 형태로 전체 데이터 직렬화",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 5,
@@ -616,7 +616,7 @@
               "8.4"
             ],
             "details": "앱 버전, 개발자 정보 표시. AuthService 연동하여 로그아웃 기능 구현",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-31T22:34:06.629Z",
+      "updated": "2025-08-31T22:53:57.112Z",
       "description": "Tasks for master context"
     }
   }

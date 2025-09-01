@@ -4,6 +4,7 @@ import 'package:baseball_diary2/widgets/nav_tab.dart';
 import 'package:baseball_diary2/home_screen/home_screen.dart';
 import 'package:baseball_diary2/screens/calendar_screen.dart';
 import 'package:baseball_diary2/screens/record_screen.dart';
+import 'package:baseball_diary2/screens/settings_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -20,7 +21,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     Center(child: Text('Recent Diary Entries')),
     const RecordScreen(),
     Center(child: Text('Graphs')),
-    Center(child: Text('Settings')),
+    const SettingsScreen(),
   ];
 
   void _onTap(int index) {
