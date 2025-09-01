@@ -169,7 +169,7 @@ class CalendarScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(6.0),
       decoration: BoxDecoration(
-        color: theme.primaryColor,
+        color: theme.colorScheme.primary,
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -214,7 +214,7 @@ class CalendarScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(6.0),
       decoration: BoxDecoration(
-        color: theme.primaryColor.withValues(alpha: 0.6),
+        color: theme.colorScheme.primary.withValues(alpha: 0.6),
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -313,11 +313,11 @@ class CalendarScreen extends StatelessWidget {
                     weekendTextStyle: TextStyle(color: theme.colorScheme.error),
                     holidayTextStyle: TextStyle(color: theme.colorScheme.error),
                     selectedDecoration: BoxDecoration(
-                      color: theme.primaryColor,
+                      color: theme.colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                     todayDecoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.6),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.6),
                       shape: BoxShape.circle,
                     ),
                     markerDecoration: BoxDecoration(

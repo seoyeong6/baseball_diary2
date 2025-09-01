@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:baseball_diary2/models/team.dart';
 
@@ -7,6 +8,7 @@ void main() {
       id: 1,
       name: 'LG 트윈스',
       logoPath: 'assets/images/teams/lg_twins.png',
+      primaryColor: Color(0xFFC30452),
     );
 
     test('should create Team instance with required fields', () {
@@ -22,6 +24,7 @@ void main() {
         'id': 1,
         'name': 'LG 트윈스',
         'logoPath': 'assets/images/teams/lg_twins.png',
+        'primaryColor': 0xFFC30452,
       });
     });
 
@@ -30,6 +33,7 @@ void main() {
         'id': 1,
         'name': 'LG 트윈스',
         'logoPath': 'assets/images/teams/lg_twins.png',
+        'primaryColor': 0xFFC30452,
       };
 
       final team = Team.fromJson(json);
@@ -49,17 +53,17 @@ void main() {
     });
 
     test('should implement equality correctly', () {
-      const team1 = Team(id: 1, name: 'LG 트윈스', logoPath: 'path');
-      const team2 = Team(id: 1, name: 'Other Name', logoPath: 'other_path');
-      const team3 = Team(id: 2, name: 'LG 트윈스', logoPath: 'path');
+      const team1 = Team(id: 1, name: 'LG 트윈스', logoPath: 'path', primaryColor: Colors.red);
+      const team2 = Team(id: 1, name: 'Other Name', logoPath: 'other_path', primaryColor: Colors.blue);
+      const team3 = Team(id: 2, name: 'LG 트윈스', logoPath: 'path', primaryColor: Colors.red);
 
       expect(team1 == team2, true); // Same ID
       expect(team1 == team3, false); // Different ID
     });
 
     test('should implement hashCode correctly', () {
-      const team1 = Team(id: 1, name: 'LG 트윈스', logoPath: 'path');
-      const team2 = Team(id: 1, name: 'Other Name', logoPath: 'other_path');
+      const team1 = Team(id: 1, name: 'LG 트윈스', logoPath: 'path', primaryColor: Colors.red);
+      const team2 = Team(id: 1, name: 'Other Name', logoPath: 'other_path', primaryColor: Colors.blue);
 
       expect(team1.hashCode, team2.hashCode); // Same ID, same hashCode
     });
@@ -109,7 +113,7 @@ void main() {
       final teams = KBOTeams.getAllTeams();
       
       expect(teams.length, 10);
-      expect(() => teams.add(const Team(id: 11, name: 'Test', logoPath: 'test')),
+      expect(() => teams.add(const Team(id: 11, name: 'Test', logoPath: 'test', primaryColor: Colors.green)),
           throwsUnsupportedError);
     });
 
@@ -130,7 +134,7 @@ void main() {
     test('should have valid logo paths for all teams', () {
       for (final team in KBOTeams.teams) {
         expect(team.logoPath, isNotEmpty);
-        expect(team.logoPath, startsWith('assets/images/teams/'));
+        expect(team.logoPath, startsWith('lib/assets/images/teams/'));
         expect(team.logoPath, endsWith('.png'));
       }
     });

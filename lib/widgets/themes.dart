@@ -1,31 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 class Themes {
-  final Color colorSeed;
-  
-  Themes({this.colorSeed = Colors.black});
+  static ThemeData get lightTheme =>
+      FlexThemeData.light(scheme: FlexScheme.sanJuanBlue, useMaterial3: true);
 
-  ThemeData get _baseLightTheme => ThemeData(
-    useMaterial3: true,
-    colorSchemeSeed: colorSeed,
-    brightness: Brightness.light,
-  );
-
-  ThemeData get _baseDarkTheme => ThemeData(
-    useMaterial3: true,
-    colorSchemeSeed: colorSeed,
-    brightness: Brightness.dark,
-  );
-
-  ThemeData get lightTheme => _baseLightTheme.copyWith(
-    appBarTheme: AppBarTheme(
-      backgroundColor: _baseLightTheme.colorScheme.inversePrimary,
-    ),
-  );
-
-  ThemeData get darkTheme => _baseDarkTheme.copyWith(
-    appBarTheme: AppBarTheme(
-      backgroundColor: _baseDarkTheme.colorScheme.inversePrimary,
-    ),
-  );
+  static ThemeData get darkTheme =>
+      FlexThemeData.dark(scheme: FlexScheme.sanJuanBlue, useMaterial3: true);
 }
