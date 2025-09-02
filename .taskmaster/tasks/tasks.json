@@ -340,7 +340,7 @@
           1,
           4
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -368,7 +368,7 @@
               "5.2"
             ],
             "details": "각 카드에 썸네일 이미지, 감정 아이콘, 제목, 작성일 표시. Card 위젯으로 일관된 디자인",
-            "status": "in-progress"
+            "status": "done"
           },
           {
             "id": 4,
@@ -378,7 +378,7 @@
               "5.3"
             ],
             "details": "정렬 드롭다운 메뉴 추가. 날짜순/최신순 정렬 로직 구현. 감정별 필터링 옵션",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 5,
@@ -388,7 +388,7 @@
               "5.4"
             ],
             "details": "카드 클릭 시 상세보기 화면으로 이동. Dismissible 위젯으로 슬라이드 삭제 기능",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 6,
@@ -398,7 +398,7 @@
               "5.5"
             ],
             "details": "RefreshIndicator로 당겨서 새로고침 구현. 빈 상태일 때 안내 메시지 및 일러스트 표시",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-09-02T00:13:50.397Z",
+      "updated": "2025-09-02T00:43:41.775Z",
       "description": "Tasks for master context"
     }
   }
