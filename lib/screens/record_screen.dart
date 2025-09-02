@@ -36,6 +36,7 @@ class _RecordScreenState extends State<RecordScreen> {
   XFile? _selectedImage;
   bool _isLoading = false;
   DateTime _selectedDate = DateTime.now();
+  bool _hasExistingEntryOnDate = false;
 
   @override
   void initState() {
@@ -59,6 +60,18 @@ class _RecordScreenState extends State<RecordScreen> {
     } else {
       // 새 기록인 경우: 전달받은 날짜가 있으면 사용, 없으면 오늘 날짜
       _selectedDate = widget.selectedDate ?? DateTime.now();
+      _checkExistingEntryOnDate();
+    }
+  }
+
+  Future<void> _checkExistingEntryOnDate() async {
+    try {
+      final existingEntries = await _diaryService.getDiaryEntriesByDate(_selectedDate);
+      setState(() {
+        _hasExistingEntryOnDate = existingEntries.isNotEmpty;
+      });
+    } catch (e) {
+      debugPrint('Error checking existing entry: $e');
     }
   }
 
@@ -130,6 +143,25 @@ class _RecordScreenState extends State<RecordScreen> {
     });
 
     try {
+      // 하루에 하나의 기록만 허용: 기존 기록이 아닌 경우 해당 날짜에 기록이 있는지 확인
+      if (widget.existingEntry == null) {
+        final existingEntries = await _diaryService.getDiaryEntriesByDate(_selectedDate);
+        if (existingEntries.isNotEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('이미 해당 날짜에 기록이 있습니다. 하루에 하나의 기록만 작성할 수 있습니다.'),
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+
       final now = DateTime.now();
       
       final entry = DiaryEntry(
@@ -274,6 +306,39 @@ class _RecordScreenState extends State<RecordScreen> {
                   ],
                 ),
               ),
+              
+              // 중복 기록 경고 메시지
+              if (_hasExistingEntryOnDate && widget.existingEntry == null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber,
+                        color: Colors.orange[700],
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${_selectedDate.year}년 ${_selectedDate.month}월 ${_selectedDate.day}일에 이미 기록이 있습니다.',
+                          style: TextStyle(
+                            color: Colors.orange[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               
               const SizedBox(height: 16),
               
@@ -522,6 +587,10 @@ class _RecordScreenState extends State<RecordScreen> {
       setState(() {
         _selectedDate = picked;
       });
+      // 날짜 변경 시 해당 날짜에 기록이 있는지 다시 확인
+      if (widget.existingEntry == null) {
+        await _checkExistingEntryOnDate();
+      }
     }
   }
 }

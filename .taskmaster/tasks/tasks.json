@@ -348,7 +348,7 @@
             "description": "기록 목록을 표시할 화면 위젯 기본 구조 생성",
             "dependencies": [],
             "details": "StatefulWidget으로 DiaryListScreen 생성. main_navigation_screen.dart placeholder 교체",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -358,7 +358,7 @@
               "5.1"
             ],
             "details": "DiaryService와 연동하여 실시간 데이터 스트림 구현. StreamBuilder로 UI 자동 업데이트",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 3,
@@ -368,7 +368,7 @@
               "5.2"
             ],
             "details": "각 카드에 썸네일 이미지, 감정 아이콘, 제목, 작성일 표시. Card 위젯으로 일관된 디자인",
-            "status": "pending"
+            "status": "in-progress"
           },
           {
             "id": 4,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-08-31T22:53:57.112Z",
+      "updated": "2025-09-02T00:13:50.397Z",
       "description": "Tasks for master context"
     }
   }
