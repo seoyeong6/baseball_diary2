@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'dart:io';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
+import '../controllers/calendar_controller.dart';
 import '../main_navigation_screen.dart';
+import 'record_screen.dart';
 
-class DiaryDetailScreen extends StatelessWidget {
+class DiaryDetailScreen extends StatefulWidget {
   final DiaryEntry entry;
 
   const DiaryDetailScreen({
@@ -11,52 +15,125 @@ class DiaryDetailScreen extends StatelessWidget {
     required this.entry,
   });
 
+  @override
+  State<DiaryDetailScreen> createState() => _DiaryDetailScreenState();
+}
+
+class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
+  late DiaryEntry _currentEntry;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentEntry = widget.entry;
+  }
+
+
+  void _showDeleteConfirmDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('기록 삭제'),
+        content: const Text('이 기록을 삭제하시겠습니까? 삭제된 기록은 복구할 수 없습니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _deleteEntry();
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteEntry() async {
+    try {
+      final calendarController = Provider.of<CalendarController>(context, listen: false);
+      await calendarController.deleteDiaryEntry(widget.entry.id);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('기록이 삭제되었습니다')),
+        );
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('삭제 실패: $e')),
+        );
+      }
+    }
+  }
+
+  void _navigateToEditScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecordScreen(
+          existingEntry: _currentEntry,
+        ),
+      ),
+    ).then((result) {
+      if (result is DiaryEntry) {
+        setState(() {
+          _currentEntry = result;
+        });
+      }
+    });
+  }
+
+  void _showImageZoom(String imagePath) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _ImageZoomScreen(imagePath: imagePath),
+      ),
+    );
+  }
+
   Widget _buildEmotionSection(BuildContext context) {
     final theme = Theme.of(context);
     
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: entry.emotion.color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: entry.emotion.color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: entry.emotion.color.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              entry.emotion.fallbackIcon,
-              size: 24,
-              color: entry.emotion.color,
+          Text(
+            '오늘의 기분',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '오늘의 기분',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                _currentEntry.emotion.fallbackIcon,
+                size: 24,
+                color: _currentEntry.emotion.color,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _currentEntry.emotion.displayName,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: _currentEntry.emotion.color,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  entry.emotion.displayName,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: entry.emotion.color,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -64,53 +141,48 @@ class DiaryDetailScreen extends StatelessWidget {
   }
 
   Widget _buildStickersSection(BuildContext context) {
-    if (entry.stickers.isEmpty) return const SizedBox.shrink();
+    if (_currentEntry.stickers.isEmpty) return const SizedBox.shrink();
     
     final theme = Theme.of(context);
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '활동 스티커',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '활동 스티커',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: entry.stickers.map((stickerType) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: stickerType.color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: stickerType.color.withValues(alpha: 0.3)),
-              ),
-              child: Row(
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _currentEntry.stickers.map((stickerType) {
+              return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     stickerType.icon,
-                    size: 16,
+                    size: 20,
                     color: stickerType.color,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     stickerType.displayName,
-                    style: theme.textTheme.bodySmall?.copyWith(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       color: stickerType.color,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -122,7 +194,7 @@ class DiaryDetailScreen extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          entry.title,
+          _currentEntry.title,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -132,12 +204,18 @@ class DiaryDetailScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // TODO: 편집 화면으로 이동
-              debugPrint('Edit diary entry: ${entry.id}');
-            },
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: _navigateToEditScreen,
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: _showDeleteConfirmDialog,
+              ),
+            ],
           ),
         ],
       ),
@@ -147,13 +225,8 @@ class DiaryDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 날짜 정보
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -165,51 +238,96 @@ class DiaryDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${entry.date.year}년 ${entry.date.month}월 ${entry.date.day}일',
+                    '${_currentEntry.date.year}년 ${_currentEntry.date.month}월 ${_currentEntry.date.day}일',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
             
-            const SizedBox(height: 16),
+            Divider(color: theme.dividerColor),
             
             // 감정 섹션
-            if (entry.content.isNotEmpty) ...[
-              _buildEmotionSection(context),
-              const SizedBox(height: 16),
+            _buildEmotionSection(context),
+            
+            if (_currentEntry.content.isNotEmpty) ...[
+              Divider(color: theme.dividerColor),
+              
+              // 내용
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '일기 내용',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _currentEntry.content,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
             
-            // 내용
-            if (entry.content.isNotEmpty) ...[
-              Text(
-                '일기 내용',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+            // 사진 섹션
+            if (_currentEntry.imagePath != null) ...[
+              Divider(color: theme.dividerColor),
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '사진',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => _showImageZoom(_currentEntry.imagePath!),
+                      child: Hero(
+                        tag: 'image_${_currentEntry.id}',
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            File(_currentEntry.imagePath!),
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              width: double.infinity,
+                              height: 200,
+                              color: theme.colorScheme.surfaceVariant,
+                              child: const Center(
+                                child: Icon(Icons.broken_image, size: 48),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  entry.content,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    height: 1.6,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
             ],
             
             // 스티커 섹션
-            _buildStickersSection(context),
+            if (_currentEntry.stickers.isNotEmpty) ...[
+              Divider(color: theme.dividerColor),
+              _buildStickersSection(context),
+            ],
           ],
         ),
       ),
@@ -234,6 +352,50 @@ class DiaryDetailScreen extends StatelessWidget {
               foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ImageZoomScreen extends StatelessWidget {
+  final String imagePath;
+
+  const _ImageZoomScreen({required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: Hero(
+          tag: 'image_zoom',
+          child: InteractiveViewer(
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: Image.file(
+              File(imagePath),
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.broken_image, size: 64, color: Colors.white54),
+                    SizedBox(height: 16),
+                    Text(
+                      '이미지를 불러올 수 없습니다',
+                      style: TextStyle(color: Colors.white54),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

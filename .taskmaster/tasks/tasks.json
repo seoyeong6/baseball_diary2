@@ -413,7 +413,7 @@
           4,
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -421,7 +421,7 @@
             "description": "기록 상세보기 화면 위젯 기본 구조 생성",
             "dependencies": [],
             "details": "StatefulWidget으로 DiaryDetailScreen 생성. 기록 ID를 매개변수로 받는 구조",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -431,7 +431,7 @@
               "6.1"
             ],
             "details": "기록 데이터를 받아 제목, 본문, 감정, 사진을 읽기 전용 형태로 표시",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 3,
@@ -441,7 +441,7 @@
               "6.2"
             ],
             "details": "편집 버튼 추가. 편집 모드에서 RecordScreen과 동일한 UI 제공",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -451,7 +451,7 @@
               "6.3"
             ],
             "details": "수정 완료 시 DiaryService를 통해 업데이트. 삭제 확인 다이얼로그 추가",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 5,
@@ -461,7 +461,7 @@
               "6.4"
             ],
             "details": "WillPopScope로 뒤로가기 처리. 변경사항 있을 때 저장 여부 확인 다이얼로그",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 6,
@@ -471,7 +471,7 @@
               "6.5"
             ],
             "details": "사진 클릭 시 PhotoViewGallery나 InteractiveViewer로 확대보기. Hero 애니메이션 적용",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-09-02T00:43:41.775Z",
+      "updated": "2025-09-03T00:33:00.048Z",
       "description": "Tasks for master context"
     }
   }
