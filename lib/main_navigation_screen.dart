@@ -6,6 +6,7 @@ import 'package:baseball_diary2/screens/calendar_screen.dart';
 import 'package:baseball_diary2/screens/record_screen.dart';
 import 'package:baseball_diary2/screens/settings_screen.dart';
 import 'package:baseball_diary2/screens/diary_list_screen.dart';
+import 'package:baseball_diary2/screens/statistics_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -21,7 +22,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const CalendarScreen(),
     const DiaryListScreen(),
     const RecordScreen(),
-    Center(child: Text('Graphs')),
+    const StatisticsScreen(),
     const SettingsScreen(),
   ];
 
