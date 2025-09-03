@@ -16,11 +16,15 @@ class StatisticsScreen extends StatefulWidget {
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
   String _selectedPeriod = '1개월';
-  final List<String> _periods = ['1개월', '3개월', '1년'];
+  final List<String> _periods = ['1개월', '3개월', '1년', '사용자 지정'];
   final DiaryService _diaryService = DiaryService();
   
   List<DiaryEntry> _cachedEntries = [];
   DateTime? _lastCacheUpdate;
+  
+  // 사용자 지정 날짜 범위
+  DateTime? _customStartDate;
+  DateTime? _customEndDate;
 
   @override
   void initState() {
@@ -47,6 +51,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Future<List<DiaryEntry>> _getEntriesForPeriod(String period) async {
     final now = DateTime.now();
     DateTime startDate;
+    DateTime endDate = now.add(const Duration(days: 1));
     
     switch (period) {
       case '1개월':
@@ -58,17 +63,30 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       case '1년':
         startDate = DateTime(now.year - 1, now.month, now.day);
         break;
+      case '사용자 지정':
+        if (_customStartDate != null && _customEndDate != null) {
+          startDate = _customStartDate!;
+          endDate = _customEndDate!.add(const Duration(days: 1));
+        } else {
+          startDate = DateTime(now.year, now.month - 1, now.day);
+        }
+        break;
       default:
         startDate = DateTime(now.year, now.month - 1, now.day);
     }
     
     // DiaryService에서 모든 기록을 가져와서 기간별로 필터링
     final allEntries = await _diaryService.getAllDiaryEntries();
-    return allEntries.where((entry) => 
-      entry.date.isAfter(startDate) && 
-      entry.date.isBefore(now.add(const Duration(days: 1))) &&
-      entry.content.isNotEmpty
-    ).toList();
+    return allEntries.where((entry) {
+      // 날짜만 비교하기 위해 시간 정보 제거
+      final entryDate = DateTime(entry.date.year, entry.date.month, entry.date.day);
+      final filterStartDate = DateTime(startDate.year, startDate.month, startDate.day);
+      final filterEndDate = DateTime(endDate.year, endDate.month, endDate.day);
+      
+      return entryDate.compareTo(filterStartDate) >= 0 && 
+             entryDate.compareTo(filterEndDate) < 0 &&
+             entry.content.isNotEmpty;
+    }).toList();
   }
 
   Widget _buildSummaryStats() {
@@ -426,27 +444,111 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
+  Future<void> _showDateRangePicker() async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: _customStartDate != null && _customEndDate != null
+          ? DateTimeRange(start: _customStartDate!, end: _customEndDate!)
+          : null,
+      helpText: '통계 기간 선택',
+      cancelText: '취소',
+      confirmText: '확인',
+      saveText: '적용',
+    );
+    
+    if (picked != null) {
+      setState(() {
+        _customStartDate = picked.start;
+        _customEndDate = picked.end;
+        _selectedPeriod = '사용자 지정'; // 자동으로 사용자 지정 선택
+      });
+      _loadData();
+    }
+  }
+
   Widget _buildPeriodFilter() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: _periods.map((period) {
-        final isSelected = _selectedPeriod == period;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: FilterChip(
-            label: Text(period),
-            selected: isSelected,
-            onSelected: (selected) {
-              if (selected) {
-                setState(() {
-                  _selectedPeriod = period;
-                });
-                _loadData();
-              }
-            },
+    return Column(
+      children: [
+        // 기본 필터 칩들
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: _periods.map((period) {
+            final isSelected = _selectedPeriod == period;
+            
+            // 사용자 지정의 경우 특별한 처리
+            if (period == '사용자 지정') {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: GestureDetector(
+                  onTap: _showDateRangePicker,
+                  child: FilterChip(
+                    label: Text(period),
+                    selected: isSelected,
+                    onSelected: null, // onSelected를 비활성화하고 GestureDetector 사용
+                  ),
+                ),
+              );
+            }
+            
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: FilterChip(
+                label: Text(period),
+                selected: isSelected,
+                onSelected: (selected) {
+                  if (selected) {
+                    setState(() {
+                      _selectedPeriod = period;
+                    });
+                    _loadData();
+                  }
+                },
+              ),
+            );
+          }).toList(),
+        ),
+        
+        // 사용자 지정 날짜 표시
+        if (_selectedPeriod == '사용자 지정' && _customStartDate != null && _customEndDate != null) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  size: 14,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${_customStartDate!.year}.${_customStartDate!.month}.${_customStartDate!.day} - ${_customEndDate!.year}.${_customEndDate!.month}.${_customEndDate!.day}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: _showDateRangePicker,
+                  child: Icon(
+                    Icons.edit,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ],
+            ),
           ),
-        );
-      }).toList(),
+        ],
+      ],
     );
   }
 
