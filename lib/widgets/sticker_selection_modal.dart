@@ -194,7 +194,7 @@ class _StickerSelectionModalState extends State<StickerSelectionModal>
             controller: _tabController,
             tabs: const [
               Tab(text: '경기'),
-              Tab(text: '활동'),
+              Tab(text: '날씨'),
               Tab(text: '기타'),
             ],
             labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
@@ -210,7 +210,9 @@ class _StickerSelectionModalState extends State<StickerSelectionModal>
                 _buildStickerGrid(StickerType.getGameRelatedTypes()),
                 _buildStickerGrid(StickerType.getActivityTypes()),
                 _buildStickerGrid([
-                  StickerType.rain,
+                  StickerType.practice,
+                  StickerType.training,
+                  StickerType.analysis,
                   StickerType.postponed,
                   StickerType.special,
                 ]),

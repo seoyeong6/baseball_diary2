@@ -270,6 +270,7 @@ class _RecordScreenState extends State<RecordScreen> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false,
         actions: [
           if (_isLoading)
             const Padding(
@@ -629,7 +630,7 @@ class _RecordScreenState extends State<RecordScreen> {
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
+      lastDate: DateTime.now(),
     );
     
     if (picked != null && picked != _selectedDate) {

@@ -8,10 +8,11 @@ enum StickerType {
   defeat('defeat', '패배', Icons.thumb_down, Colors.grey),
   draw('draw', '무승부', Icons.drag_handle, Colors.indigo),
   
-  // 활동 관련
-  practice('practice', '연습', Icons.sports_baseball, Colors.green),
-  training('training', '훈련', Icons.directions_run, Colors.teal),
-  analysis('analysis', '분석', Icons.analytics, Colors.purple),
+  // 날씨 관련
+  sunny('sunny', '맑음', Icons.wb_sunny, Colors.orange),
+  cloudy('cloudy', '흐림', Icons.cloud, Colors.grey),
+  rainy('rainy', '비', Icons.grain, Colors.blue),
+  snowy('snowy', '눈', Icons.ac_unit, Colors.lightBlue),
   
   // 특별한 순간
   homerun('homerun', '홈런', FontAwesomeIcons.baseballBatBall, Colors.red),
@@ -19,7 +20,9 @@ enum StickerType {
   steal('steal', '도루', Icons.flash_on, Colors.cyan),
   
   // 기타
-  rain('rain', '우천', Icons.cloud, Colors.blueGrey),
+  practice('practice', '연습', Icons.sports_baseball, Colors.green),
+  training('training', '훈련', Icons.directions_run, Colors.teal),
+  analysis('analysis', '분석', Icons.analytics, Colors.purple),
   postponed('postponed', '연기', Icons.schedule, Colors.brown),
   special('special', '특별', Icons.star, Colors.pink);
 
@@ -63,7 +66,7 @@ enum StickerType {
   }
 
   static List<StickerType> getActivityTypes() {
-    return [StickerType.practice, StickerType.training, StickerType.analysis];
+    return [StickerType.sunny, StickerType.cloudy, StickerType.rainy, StickerType.snowy];
   }
 
 

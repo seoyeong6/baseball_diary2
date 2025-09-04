@@ -1145,7 +1145,7 @@ class _StickerDetailCardState extends State<_StickerDetailCard> {
                   
                   // 최근 사용 날짜 섹션
                   Text(
-                    '최근 사용된 날짜:',
+                    '최근 사용된 날짜(최대 3회):',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.8),

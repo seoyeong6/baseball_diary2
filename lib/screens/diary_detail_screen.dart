@@ -203,6 +203,7 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false,
         actions: [
           Row(
             mainAxisSize: MainAxisSize.min,
