@@ -16,6 +16,18 @@ class CalendarScreen extends StatelessWidget {
 
   void _showStickerSelectionModal(BuildContext context, CalendarController controller) {
     final dateToUse = controller.selectedDay ?? DateTime.now();
+    final entries = controller.getCachedEventsForDay(dateToUse);
+
+    // 기존 기록이 있으면 스티커 추가를 차단
+    if (entries.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('이미 기록이 있는 날짜에는 스티커를 추가할 수 없습니다'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
     showModalBottomSheet(
       context: context,

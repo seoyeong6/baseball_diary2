@@ -107,20 +107,23 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     int draws = 0;
     
     for (final entry in _cachedEntries) {
-      for (final sticker in entry.stickers) {
-        switch (sticker) {
-          case StickerType.victory:
-            victories++;
-            break;
-          case StickerType.defeat:
-            defeats++;
-            break;
-          case StickerType.draw:
-            draws++;
-            break;
-          default:
-            // 다른 스티커 타입들은 게임 결과가 아니므로 무시
-            break;
+      final hasWatchSticker = entry.stickers.contains(StickerType.watch);
+      
+      if (hasWatchSticker) {
+        for (final sticker in entry.stickers) {
+          switch (sticker) {
+            case StickerType.victory:
+              victories++;
+              break;
+            case StickerType.defeat:
+              defeats++;
+              break;
+            case StickerType.draw:
+              draws++;
+              break;
+            default:
+              break;
+          }
         }
       }
     }
@@ -189,7 +192,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   children: [
                     Expanded(
                       child: _StatCard(
-                        title: '평균 일일 활동',
+                        title: '평균 스티커 수',
                         value: '$avgDailyActivity개',
                         icon: Icons.trending_up,
                       ),
@@ -266,7 +269,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '성과 통계',
+              '직관 승률',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

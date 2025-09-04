@@ -213,7 +213,6 @@ class _StickerSelectionModalState extends State<StickerSelectionModal>
                   StickerType.practice,
                   StickerType.training,
                   StickerType.analysis,
-                  StickerType.postponed,
                   StickerType.special,
                 ]),
               ],
