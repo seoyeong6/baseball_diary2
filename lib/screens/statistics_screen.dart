@@ -618,10 +618,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 stickerType: sticker,
                 count: count,
                 dates: dates,
-                mostCommonEmotion: mostCommonEmotion?.key,
-                emotionPercentage: mostCommonEmotion != null 
-                    ? ((mostCommonEmotion.value / count) * 100).round()
-                    : 0,
+                emotionCounts: emotions,
               );
             }).toList(),
           ],
@@ -983,15 +980,13 @@ class _StickerDetailCard extends StatefulWidget {
   final StickerType stickerType;
   final int count;
   final List<DateTime> dates;
-  final Emotion? mostCommonEmotion;
-  final int emotionPercentage;
+  final Map<Emotion, int> emotionCounts;
 
   const _StickerDetailCard({
     required this.stickerType,
     required this.count,
     required this.dates,
-    required this.mostCommonEmotion,
-    required this.emotionPercentage,
+    required this.emotionCounts,
   });
 
   @override
@@ -1005,9 +1000,9 @@ class _StickerDetailCardState extends State<_StickerDetailCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    // 최근 사용 날짜들 (최대 3개)
+    // 최근 사용 날짜들 (최대 3개) - 오래된 것부터 최신순으로
     final sortedDates = widget.dates.toList()
-      ..sort((a, b) => b.compareTo(a));
+      ..sort((a, b) => a.compareTo(b));
     final recentDates = sortedDates.take(3).toList();
     
     return Container(
@@ -1067,26 +1062,6 @@ class _StickerDetailCardState extends State<_StickerDetailCard> {
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
-                        if (widget.mostCommonEmotion != null) ...[
-                          const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Icon(
-                                widget.mostCommonEmotion!.fallbackIcon,
-                                size: 12,
-                                color: widget.mostCommonEmotion!.color,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${widget.mostCommonEmotion!.displayName} ${widget.emotionPercentage}%',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: widget.mostCommonEmotion!.color,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
                       ],
                     ),
                   ),
@@ -1112,6 +1087,63 @@ class _StickerDetailCardState extends State<_StickerDetailCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 감정 비율 섹션
+                  if (widget.emotionCounts.isNotEmpty) ...[
+                    Text(
+                      '함께 나타난 감정:',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: widget.emotionCounts.entries
+                          .map((emotionEntry) {
+                        final emotion = emotionEntry.key;
+                        final count = emotionEntry.value;
+                        final percentage = ((count / widget.count) * 100).round();
+                        
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: emotion.color.withValues(alpha: 0.1),
+                            border: Border.all(
+                              color: emotion.color.withValues(alpha: 0.3),
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                emotion.fallbackIcon,
+                                size: 12,
+                                color: emotion.color,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${emotion.displayName} $percentage%',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: emotion.color,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  
+                  // 최근 사용 날짜 섹션
                   Text(
                     '최근 사용된 날짜:',
                     style: theme.textTheme.bodySmall?.copyWith(

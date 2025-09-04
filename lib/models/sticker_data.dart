@@ -15,7 +15,7 @@ enum StickerType {
   
   // 특별한 순간
   homerun('homerun', '홈런', FontAwesomeIcons.baseballBatBall, Colors.red),
-  strikeout('strikeout', '삼진', Icons.close, Colors.black),
+  strikeout('strikeout', '삼진', Icons.close, Colors.deepOrange),
   steal('steal', '도루', Icons.flash_on, Colors.cyan),
   
   // 기타
