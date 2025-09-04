@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:baseball_diary2/widgets/themes.dart';
 import 'package:baseball_diary2/main_navigation_screen.dart';
 import 'package:baseball_diary2/screens/team_selection_screen.dart';
@@ -7,9 +8,15 @@ import 'package:baseball_diary2/services/auth_service.dart';
 import 'package:baseball_diary2/controllers/calendar_controller.dart';
 import 'package:baseball_diary2/controllers/theme_controller.dart';
 import 'package:baseball_diary2/services/team_selection_helper.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
   await AuthService().initialize();
   runApp(const BaseballDiaryApp());
 }

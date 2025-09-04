@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
+import 'dart:typed_data';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../models/sticker_data.dart';
 import '../services/diary_service.dart';
 import '../controllers/calendar_controller.dart';
 import '../widgets/sticker_selection_modal.dart';
+import '../services/image_service.dart';
 import 'diary_detail_screen.dart';
 
 class RecordScreen extends StatefulWidget {
@@ -30,6 +33,7 @@ class _RecordScreenState extends State<RecordScreen> {
   final _contentController = TextEditingController();
   final DiaryService _diaryService = DiaryService();
   final ImagePicker _picker = ImagePicker();
+  final ImageService _imageService = ImageService();
   
   Emotion _selectedEmotion = Emotion.neutral;
   List<StickerType> _selectedStickers = [];
@@ -164,6 +168,32 @@ class _RecordScreenState extends State<RecordScreen> {
 
       final now = DateTime.now();
       
+      // 이미지가 있으면 Firebase Storage에 업로드
+      String? firebaseImageUrl;
+      if (_selectedImage != null) {
+        firebaseImageUrl = await _imageService.uploadImageToFirebase(
+          _selectedImage!.path,
+          quality: 85,
+          maxWidth: 1080,
+          maxHeight: 1080,
+        );
+        
+        if (firebaseImageUrl == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('이미지 업로드에 실패했습니다'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+      
       final entry = DiaryEntry(
         id: widget.existingEntry?.id ?? '${now.millisecondsSinceEpoch}',
         title: _titleController.text.trim(),
@@ -172,7 +202,7 @@ class _RecordScreenState extends State<RecordScreen> {
         date: _selectedDate,
         teamId: 1,
         stickers: _selectedStickers,
-        imagePath: _selectedImage?.path,
+        imagePath: firebaseImageUrl ?? widget.existingEntry?.imagePath,
       );
 
       debugPrint('Saving entry: ${entry.toString()}');
@@ -540,12 +570,31 @@ class _RecordScreenState extends State<RecordScreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.file(
-                        File(_selectedImage!.path),
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
+                      child: kIsWeb
+                          ? FutureBuilder<Uint8List>(
+                              future: _selectedImage!.readAsBytes(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Image.memory(
+                                    snapshot.data!,
+                                    width: double.infinity,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  );
+                                }
+                                return const SizedBox(
+                                  width: double.infinity,
+                                  height: 200,
+                                  child: Center(child: CircularProgressIndicator()),
+                                );
+                              },
+                            )
+                          : Image.file(
+                              File(_selectedImage!.path),
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                     Positioned(
                       top: 8,

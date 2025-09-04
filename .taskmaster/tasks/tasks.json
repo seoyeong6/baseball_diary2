@@ -486,7 +486,7 @@
           1,
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -494,7 +494,7 @@
             "description": "fl_chart 패키지를 pubspec.yaml에 추가",
             "dependencies": [],
             "details": "fl_chart: ^0.66.2 패키지 추가 및 flutter pub get 실행",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -504,7 +504,7 @@
               "7.1"
             ],
             "details": "StatefulWidget으로 StatisticsScreen 생성. main_navigation_screen.dart placeholder 교체",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 3,
@@ -514,7 +514,7 @@
               "7.2"
             ],
             "details": "PieChart 위젯으로 감정별 데이터 비율 시각화. 팀 색상 테마 적용",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -524,7 +524,7 @@
               "7.3"
             ],
             "details": "LineChart 위젯으로 월별 기분 변화 시각화. 데이터 집계 로직 구현",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 5,
@@ -534,7 +534,7 @@
               "7.4"
             ],
             "details": "Card 위젯으로 주요 통계 지표 표시. 전체/월별 기록 수 집계",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 6,
@@ -544,7 +544,7 @@
               "7.5"
             ],
             "details": "최근 1개월, 3개월, 1년 필터. 차트 데이터 캐싱으로 성능 최적화",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 7,
@@ -554,7 +554,7 @@
               "7.6"
             ],
             "details": "데이터가 없을 때 안내 메시지 및 일러스트레이션 표시",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
@@ -630,7 +630,7 @@
         "dependencies": [
           1
         ],
-        "status": "deferred",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -638,7 +638,7 @@
             "description": "Firebase 관련 패키지들을 pubspec.yaml에 추가",
             "dependencies": [],
             "details": "firebase_core: ^2.24.2, cloud_firestore: ^4.13.6, firebase_storage 패키지 추가",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -648,7 +648,7 @@
               "9.1"
             ],
             "details": "Firebase 콘솔에서 프로젝트 생성. google-services.json 및 GoogleService-Info.plist 설정",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 3,
@@ -658,7 +658,7 @@
               "9.2"
             ],
             "details": "Firestore 데이터베이스 생성. 컴렉션 구조 설계: users/{userId}/diaries/{diaryId}",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -668,7 +668,7 @@
               "9.3"
             ],
             "details": "Firestore에서 데이터 생성, 읽기, 업데이트, 삭제 기능 구현",
-            "status": "pending"
+            "status": "in-progress"
           },
           {
             "id": 5,
@@ -724,7 +724,7 @@
           5,
           7
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -732,7 +732,7 @@
             "description": "성능 최적화를 위한 패키지들을 pubspec.yaml에 추가",
             "dependencies": [],
             "details": "cached_network_image: ^3.3.1, hive: ^2.2.3, flutter_image_compress 패키지 추가",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 2,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-09-03T00:33:00.048Z",
+      "updated": "2025-09-04T03:50:07.281Z",
       "description": "Tasks for master context"
     }
   }

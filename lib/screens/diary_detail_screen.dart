@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:io';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../controllers/calendar_controller.dart';
 import '../main_navigation_screen.dart';
+import '../widgets/cached_image_widget.dart';
 import 'record_screen.dart';
 
 class DiaryDetailScreen extends StatefulWidget {
@@ -299,22 +299,12 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
                       onTap: () => _showImageZoom(_currentEntry.imagePath!),
                       child: Hero(
                         tag: 'image_${_currentEntry.id}',
-                        child: ClipRRect(
+                        child: CachedImageWidget(
+                          imagePath: _currentEntry.imagePath,
+                          width: double.infinity,
+                          height: 200,
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            File(_currentEntry.imagePath!),
-                            width: double.infinity,
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              width: double.infinity,
-                              height: 200,
-                              color: theme.colorScheme.surfaceVariant,
-                              child: const Center(
-                                child: Icon(Icons.broken_image, size: 48),
-                              ),
-                            ),
-                          ),
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -381,22 +371,9 @@ class _ImageZoomScreen extends StatelessWidget {
           child: InteractiveViewer(
             minScale: 0.5,
             maxScale: 4.0,
-            child: Image.file(
-              File(imagePath),
+            child: CachedImageWidget(
+              imagePath: imagePath,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.broken_image, size: 64, color: Colors.white54),
-                    SizedBox(height: 16),
-                    Text(
-                      '이미지를 불러올 수 없습니다',
-                      style: TextStyle(color: Colors.white54),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
         ),
