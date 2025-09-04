@@ -12,11 +12,9 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   await AuthService().initialize();
   runApp(const BaseballDiaryApp());
 }
@@ -29,7 +27,6 @@ class BaseballDiaryApp extends StatefulWidget {
 }
 
 class _BaseballDiaryAppState extends State<BaseballDiaryApp> {
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -68,14 +65,12 @@ class _AppInitializerState extends State<AppInitializer> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
         final hasSelectedTeam = snapshot.data ?? false;
-        
+
         if (hasSelectedTeam) {
           return const MainNavigationScreen();
         } else {

@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 enum Emotion {
   excited('excited', 'assets/images/emotions/excited.png', '흥분', Colors.orange),
   happy('happy', 'assets/images/emotions/happy.png', '기쁨', Colors.amber),
-  neutral('neutral', 'assets/images/emotions/neutral.png', '보통', Colors.grey),
+  neutral('neutral', 'assets/images/emotions/neutral.png', '보통', Color(0xFF616161)),
   sad('sad', 'assets/images/emotions/sad.png', '슬픔', Colors.blue),
   angry('angry', 'assets/images/emotions/angry.png', '화남', Colors.red);
 

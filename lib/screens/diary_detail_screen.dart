@@ -295,16 +295,17 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () => _showImageZoom(_currentEntry.imagePath!),
-                      child: Hero(
-                        tag: 'image_${_currentEntry.id}',
-                        child: CachedImageWidget(
-                          imagePath: _currentEntry.imagePath,
-                          width: double.infinity,
-                          height: 200,
-                          borderRadius: BorderRadius.circular(8),
-                          fit: BoxFit.cover,
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => _showImageZoom(_currentEntry.imagePath!),
+                        child: Hero(
+                          tag: 'image_${_currentEntry.id}',
+                          child: CachedImageWidget(
+                            imagePath: _currentEntry.imagePath,
+                            height: 200,
+                            borderRadius: BorderRadius.circular(8),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
@@ -322,7 +323,7 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         child: SizedBox(
           width: double.infinity,
           height: 48,

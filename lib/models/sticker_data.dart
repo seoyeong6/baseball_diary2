@@ -4,9 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 enum StickerType {
   // 경기 관련
   watch('watch', '관람', Icons.stadium, Colors.blue),
-  victory('victory', '승리', Icons.emoji_events, Colors.amber),
+  victory('victory', '승리', Icons.emoji_events, Color(0xFFFF8F00)),
   defeat('defeat', '패배', Icons.thumb_down, Colors.grey),
-  draw('draw', '무승부', Icons.drag_handle, Colors.orange),
+  draw('draw', '무승부', Icons.drag_handle, Colors.indigo),
   
   // 활동 관련
   practice('practice', '연습', Icons.sports_baseball, Colors.green),

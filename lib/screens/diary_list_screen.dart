@@ -137,7 +137,7 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
-          'Diary',
+          '야구 일기',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
