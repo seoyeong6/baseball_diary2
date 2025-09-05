@@ -19,11 +19,13 @@ class DiaryService extends ChangeNotifier {
   bool _isInitialized = false;
   bool _isLoading = false;
   String? _lastError;
+  bool _dataCleared = false;
 
   bool get isInitialized => _isInitialized;
   bool get isLoading => _isLoading;
   String? get lastError => _lastError;
   bool get isUsingCloudStorage => _authService.isAuthenticated;
+  bool get dataCleared => _dataCleared;
 
   /// 서비스 초기화
   Future<void> initialize() async {
@@ -418,6 +420,9 @@ class DiaryService extends ChangeNotifier {
           await _firebaseService.clearAllUserData();
         }
       }
+      
+      // 데이터 삭제 완료 플래그 설정
+      _dataCleared = true;
     } catch (e) {
       _lastError = '데이터 삭제에 실패했습니다: $e';
       notifyListeners();
@@ -521,5 +526,10 @@ class DiaryService extends ChangeNotifier {
     if (!_isInitialized) {
       await initialize();
     }
+  }
+
+  /// 데이터 삭제 플래그 리셋
+  void resetDataClearedFlag() {
+    _dataCleared = false;
   }
 }

@@ -116,6 +116,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _deleteAllData() async {
+    // 확인 대화상자 표시
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('모든 데이터 삭제'),
+        content: const Text(
+          '모든 야구 일기와 스티커 기록이 삭제됩니다.\n'
+          '이 작업은 되돌릴 수 없습니다.\n\n'
+          '정말로 삭제하시겠습니까?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final diaryService = DiaryService();
+      await diaryService.initialize();
+      await diaryService.clearAllData();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('모든 데이터가 삭제되었습니다'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        
+        // 데이터 삭제 플래그를 잠시 후 리셋 (리스너들이 처리할 시간을 줌)
+        Future.delayed(const Duration(milliseconds: 100), () {
+          diaryService.resetDataClearedFlag();
+        });
+      }
+    } catch (e) {
+      debugPrint('Delete data error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('데이터 삭제에 실패했습니다: $e'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -221,6 +291,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('기록을 JSON 파일로 백업'),
             trailing: const Icon(Icons.download),
             onTap: _exportData,
+          ),
+          ListTile(
+            title: Text(
+              '데이터 삭제하기',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+            subtitle: const Text('모든 기록을 삭제 (복구 불가)'),
+            trailing: Icon(
+              Icons.delete_forever,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            onTap: _deleteAllData,
           ),
 
           _buildDivider(context),

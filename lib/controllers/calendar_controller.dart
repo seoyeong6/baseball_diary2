@@ -35,6 +35,30 @@ class CalendarController extends ChangeNotifier {
   CalendarController() {
     _selectedDay = _focusedDay;
     _initialize();
+    // DiaryService의 변경 사항을 감지하여 캘린더 데이터 새로고침
+    _diaryService.addListener(_onDiaryServiceChanged);
+  }
+
+  @override
+  void dispose() {
+    _diaryService.removeListener(_onDiaryServiceChanged);
+    super.dispose();
+  }
+
+  void _onDiaryServiceChanged() {
+    // 데이터가 삭제되었을 때만 반응
+    if (_diaryService.dataCleared && _isInitialized && !_isLoading) {
+      // 비동기 작업을 Future.microtask로 래핑하여 순환 참조 방지
+      Future.microtask(() async {
+        try {
+          await _loadCalendarData();
+          await _loadEventsForSelectedDay();
+          notifyListeners();
+        } catch (e) {
+          debugPrint('Error in _onDiaryServiceChanged: $e');
+        }
+      });
+    }
   }
 
   Future<void> _initialize() async {

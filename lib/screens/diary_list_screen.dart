@@ -34,10 +34,32 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
   void initState() {
     super.initState();
     _loadDiaryEntries();
+    // DiaryService의 상태 변경을 감지
+    _diaryService.addListener(_onDiaryServiceChanged);
+  }
+
+  @override
+  void dispose() {
+    // 리스너 제거
+    _diaryService.removeListener(_onDiaryServiceChanged);
+    super.dispose();
+  }
+
+  void _onDiaryServiceChanged() {
+    // 데이터가 삭제되었을 때만 반응
+    if (_diaryService.dataCleared && mounted) {
+      _loadDiaryEntries();
+    }
+  }
+
+  @override
+  void didUpdateWidget(DiaryListScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 위젯이 업데이트될 때 데이터 다시 로드
+    _loadDiaryEntries();
   }
 
   Future<void> _loadDiaryEntries() async {
-    debugPrint('_loadDiaryEntries 시작');
     try {
       setState(() {
         _isLoading = true;
@@ -45,17 +67,14 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
 
       // 선택된 팀 ID 로드
       _selectedTeamId = await TeamSelectionHelper.getSelectedTeamId();
-      debugPrint('선택된 팀 ID: $_selectedTeamId');
 
       await _diaryService.initialize();
       final allEntries = await _diaryService.getAllDiaryEntries();
-      debugPrint('전체 불러온 기록 수: ${allEntries.length}');
 
       // 선택된 팀이 있으면 해당 팀의 기록만 필터링
       List<DiaryEntry> filteredByTeam;
       if (_selectedTeamId != null) {
         filteredByTeam = allEntries.where((entry) => entry.teamId == _selectedTeamId).toList();
-        debugPrint('팀 필터링 후 기록 수: ${filteredByTeam.length}');
       } else {
         filteredByTeam = allEntries;
       }
@@ -65,7 +84,6 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
         _applyFiltersAndSort();
         _isLoading = false;
       });
-      debugPrint('UI 업데이트 완료');
     } catch (e) {
       debugPrint('Error loading diary entries: $e');
       setState(() {
@@ -86,7 +104,6 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
       filtered = _allEntries.where((entry) => entry.emotion == _selectedEmotionFilter).toList();
     }
     
-    debugPrint('Filtering: ${_allEntries.length} entries -> ${filtered.length} entries (filter: $_selectedEmotionFilter)');
 
     // 정렬 적용
     switch (_currentSort) {
@@ -109,7 +126,6 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
   }
 
   void _changeEmotionFilter(Emotion? emotion) {
-    debugPrint('Changing emotion filter to: $emotion');
     setState(() {
       _selectedEmotionFilter = emotion;
       _applyFiltersAndSort();
@@ -168,10 +184,7 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
           // 새로고침 버튼 (테스트용)
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () {
-              debugPrint('새로고침 버튼 클릭됨');
-              _loadDiaryEntries();
-            },
+            onPressed: _loadDiaryEntries,
             tooltip: '새로고침',
           ),
           // 정렬 옵션
@@ -206,15 +219,11 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                   ? Theme.of(context).colorScheme.primary 
                   : null,
             ),
-            onSelected: (Emotion? value) {
-              debugPrint('PopupMenu selected: $value');
-              _changeEmotionFilter(value);
-            },
+            onSelected: _changeEmotionFilter,
             itemBuilder: (context) => [
               PopupMenuItem<Emotion?>(
                 value: null,
                 onTap: () {
-                  debugPrint('전체 직접 클릭됨');
                   Future.delayed(Duration.zero, () {
                     _changeEmotionFilter(null);
                   });
