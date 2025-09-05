@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../services/diary_service.dart';
+import '../services/team_selection_helper.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
+import '../widgets/team_info_widget.dart';
 import 'diary_detail_screen.dart';
 
 enum SortOption {
@@ -26,6 +28,7 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
   bool _isLoading = true;
   SortOption _currentSort = SortOption.latest;
   Emotion? _selectedEmotionFilter;
+  int? _selectedTeamId;
 
   @override
   void initState() {
@@ -40,12 +43,25 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
         _isLoading = true;
       });
 
+      // 선택된 팀 ID 로드
+      _selectedTeamId = await TeamSelectionHelper.getSelectedTeamId();
+      debugPrint('선택된 팀 ID: $_selectedTeamId');
+
       await _diaryService.initialize();
-      final entries = await _diaryService.getAllDiaryEntries();
-      debugPrint('불러온 기록 수: ${entries.length}');
+      final allEntries = await _diaryService.getAllDiaryEntries();
+      debugPrint('전체 불러온 기록 수: ${allEntries.length}');
+
+      // 선택된 팀이 있으면 해당 팀의 기록만 필터링
+      List<DiaryEntry> filteredByTeam;
+      if (_selectedTeamId != null) {
+        filteredByTeam = allEntries.where((entry) => entry.teamId == _selectedTeamId).toList();
+        debugPrint('팀 필터링 후 기록 수: ${filteredByTeam.length}');
+      } else {
+        filteredByTeam = allEntries;
+      }
 
       setState(() {
-        _allEntries = entries;
+        _allEntries = filteredByTeam;
         _applyFiltersAndSort();
         _isLoading = false;
       });
@@ -143,6 +159,11 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0, right: 8.0),
+          child: TeamInfoWidget(),
+        ),
+        automaticallyImplyLeading: false,
         actions: [
           // 새로고침 버튼 (테스트용)
           IconButton(

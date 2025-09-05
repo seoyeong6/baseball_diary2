@@ -8,6 +8,7 @@ import '../services/team_selection_helper.dart';
 import '../services/diary_service.dart';
 import '../models/team.dart';
 import '../controllers/theme_controller.dart';
+import '../widgets/team_info_widget.dart';
 import 'team_selection_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -133,6 +134,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false,
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0, right: 8.0),
+          child: TeamInfoWidget(),
+        ),
       ),
       body: ListView(
         children: [

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/diary_entry.dart';
 import '../services/diary_service.dart';
+import '../services/team_selection_helper.dart';
 
 class CalendarController extends ChangeNotifier {
   final DiaryService _diaryService = DiaryService();
@@ -15,6 +16,9 @@ class CalendarController extends ChangeNotifier {
   final Map<DateTime, List<DiaryEntry>> _eventCache = {};
   List<DiaryEntry> _selectedEvents = [];
   
+  // Team filtering
+  int? _selectedTeamId;
+  
   // Loading states
   bool _isLoading = false;
   bool _isInitialized = false;
@@ -26,6 +30,7 @@ class CalendarController extends ChangeNotifier {
   List<DiaryEntry> get selectedEvents => _selectedEvents;
   bool get isLoading => _isLoading;
   bool get isInitialized => _isInitialized;
+  int? get selectedTeamId => _selectedTeamId;
 
   CalendarController() {
     _selectedDay = _focusedDay;
@@ -37,6 +42,9 @@ class CalendarController extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // 선택된 팀 ID 로드
+      _selectedTeamId = await TeamSelectionHelper.getSelectedTeamId();
+      
       await _diaryService.initialize();
       await _loadCalendarData();
       await _loadEventsForSelectedDay();
@@ -79,18 +87,27 @@ class CalendarController extends ChangeNotifier {
 
   List<DiaryEntry> getCachedEventsForDay(DateTime day) {
     final normalizedDate = DateTime(day.year, day.month, day.day);
-    return _eventCache[normalizedDate] ?? [];
+    final allEvents = _eventCache[normalizedDate] ?? [];
+    
+    // 선택된 팀이 있으면 해당 팀의 기록만 필터링
+    if (_selectedTeamId != null) {
+      return allEvents.where((event) => event.teamId == _selectedTeamId).toList();
+    }
+    
+    return allEvents;
   }
 
   Future<void> _loadEventsForSelectedDay() async {
     if (_selectedDay != null) {
       final normalizedDate = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
       if (_eventCache.containsKey(normalizedDate)) {
-        _selectedEvents = _eventCache[normalizedDate]!;
+        // 캐시에서 가져올 때도 팀별 필터링 적용
+        _selectedEvents = getCachedEventsForDay(_selectedDay!);
       } else {
         final events = await _getEventsForDay(_selectedDay!);
         _eventCache[normalizedDate] = events;
-        _selectedEvents = events;
+        // 새로 가져온 이벤트도 팀별 필터링 적용
+        _selectedEvents = getCachedEventsForDay(_selectedDay!);
       }
       notifyListeners();
     }

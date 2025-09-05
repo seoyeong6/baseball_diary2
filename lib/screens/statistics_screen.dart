@@ -4,6 +4,7 @@ import '../services/diary_service.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../models/sticker_data.dart';
+import '../widgets/team_info_widget.dart';
 
 /// 감정 데이터 기반 시각화와 팀별 기록 통계를 보여주는 통계 화면
 class StatisticsScreen extends StatefulWidget {
@@ -884,6 +885,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0, right: 8.0),
+          child: TeamInfoWidget(),
+        ),
+        automaticallyImplyLeading: false,
       ),
       body: RefreshIndicator(
         onRefresh: _loadData,

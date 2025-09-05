@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../screens/emotion_preview.dart';
 import '../screens/sticker_preview.dart';
+import '../widgets/team_info_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,6 +14,11 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Home Screen'),
         foregroundColor: Colors.black,
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0, right: 8.0),
+          child: TeamInfoWidget(),
+        ),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {

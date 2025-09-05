@@ -11,17 +11,15 @@ import '../services/diary_service.dart';
 import '../controllers/calendar_controller.dart';
 import '../widgets/sticker_selection_modal.dart';
 import '../services/image_service.dart';
+import '../services/team_selection_helper.dart';
+import '../widgets/team_info_widget.dart';
 import 'diary_detail_screen.dart';
 
 class RecordScreen extends StatefulWidget {
   final DateTime? selectedDate;
   final DiaryEntry? existingEntry;
 
-  const RecordScreen({
-    super.key,
-    this.selectedDate,
-    this.existingEntry,
-  });
+  const RecordScreen({super.key, this.selectedDate, this.existingEntry});
 
   @override
   State<RecordScreen> createState() => _RecordScreenState();
@@ -34,7 +32,7 @@ class _RecordScreenState extends State<RecordScreen> {
   final DiaryService _diaryService = DiaryService();
   final ImagePicker _picker = ImagePicker();
   final ImageService _imageService = ImageService();
-  
+
   Emotion _selectedEmotion = Emotion.neutral;
   List<StickerType> _selectedStickers = [];
   XFile? _selectedImage;
@@ -70,7 +68,9 @@ class _RecordScreenState extends State<RecordScreen> {
 
   Future<void> _checkExistingEntryOnDate() async {
     try {
-      final existingEntries = await _diaryService.getDiaryEntriesByDate(_selectedDate);
+      final existingEntries = await _diaryService.getDiaryEntriesByDate(
+        _selectedDate,
+      );
       setState(() {
         _hasExistingEntryOnDate = existingEntries.isNotEmpty;
       });
@@ -94,7 +94,7 @@ class _RecordScreenState extends State<RecordScreen> {
         maxHeight: 1080,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         setState(() {
           _selectedImage = image;
@@ -149,7 +149,9 @@ class _RecordScreenState extends State<RecordScreen> {
     try {
       // 하루에 하나의 기록만 허용: 기존 기록이 아닌 경우 해당 날짜에 기록이 있는지 확인
       if (widget.existingEntry == null) {
-        final existingEntries = await _diaryService.getDiaryEntriesByDate(_selectedDate);
+        final existingEntries = await _diaryService.getDiaryEntriesByDate(
+          _selectedDate,
+        );
         if (existingEntries.isNotEmpty) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -167,7 +169,7 @@ class _RecordScreenState extends State<RecordScreen> {
       }
 
       final now = DateTime.now();
-      
+
       // 이미지가 있으면 Firebase Storage에 업로드
       String? firebaseImageUrl;
       if (_selectedImage != null) {
@@ -177,7 +179,7 @@ class _RecordScreenState extends State<RecordScreen> {
           maxWidth: 1080,
           maxHeight: 1080,
         );
-        
+
         if (firebaseImageUrl == null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -193,39 +195,47 @@ class _RecordScreenState extends State<RecordScreen> {
           return;
         }
       }
-      
+
+      // 선택된 팀 ID 가져오기 (없으면 기본값 1 사용)
+      final selectedTeamId = await TeamSelectionHelper.getSelectedTeamId() ?? 1;
+
       final entry = DiaryEntry(
         id: widget.existingEntry?.id ?? '${now.millisecondsSinceEpoch}',
         title: _titleController.text.trim(),
         content: _contentController.text.trim(),
         emotion: _selectedEmotion,
         date: _selectedDate,
-        teamId: 1,
+        teamId: selectedTeamId,
         stickers: _selectedStickers,
         imagePath: firebaseImageUrl ?? widget.existingEntry?.imagePath,
       );
 
       debugPrint('Saving entry: ${entry.toString()}');
-      
+
       if (mounted) {
         // CalendarController를 통해 저장 및 캐시 업데이트
-        final calendarController = Provider.of<CalendarController>(context, listen: false);
+        final calendarController = Provider.of<CalendarController>(
+          context,
+          listen: false,
+        );
         if (widget.existingEntry != null) {
           await calendarController.updateDiaryEntry(entry);
         } else {
           await calendarController.addNewDiaryEntry(entry);
         }
-        
+
         debugPrint('Entry saved successfully');
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(widget.existingEntry != null ? '기록이 수정되었습니다' : '기록이 저장되었습니다'),
+            content: Text(
+              widget.existingEntry != null ? '기록이 수정되었습니다' : '기록이 저장되었습니다',
+            ),
             duration: const Duration(seconds: 2),
           ),
         );
         debugPrint('Navigating to detail screen...');
-        
+
         // 저장된 기록의 상세보기로 이동
         Navigator.pushReplacement(
           context,
@@ -256,21 +266,27 @@ class _RecordScreenState extends State<RecordScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           widget.existingEntry != null ? '기록 수정' : '새 기록 작성',
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
+        leading: const Padding(
+          padding: EdgeInsets.only(
+            left: 16.0,
+            top: 8.0,
+            bottom: 8.0,
+            right: 8.0,
+          ),
+          child: TeamInfoWidget(),
+        ),
         actions: [
           if (_isLoading)
             const Padding(
@@ -284,10 +300,7 @@ class _RecordScreenState extends State<RecordScreen> {
               ),
             )
           else
-            TextButton(
-              onPressed: _saveEntry,
-              child: const Text('저장'),
-            ),
+            TextButton(onPressed: _saveEntry, child: const Text('저장')),
         ],
       ),
       body: Form(
@@ -314,7 +327,9 @@ class _RecordScreenState extends State<RecordScreen> {
                         Text(
                           '기록 날짜',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -330,14 +345,16 @@ class _RecordScreenState extends State<RecordScreen> {
                       onPressed: _selectDate,
                       icon: const Icon(Icons.calendar_today),
                       style: IconButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        backgroundColor: theme.colorScheme.primary.withValues(
+                          alpha: 0.1,
+                        ),
                         foregroundColor: theme.colorScheme.primary,
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
               // 중복 기록 경고 메시지
               if (_hasExistingEntryOnDate && widget.existingEntry == null) ...[
                 const SizedBox(height: 16),
@@ -347,7 +364,9 @@ class _RecordScreenState extends State<RecordScreen> {
                   decoration: BoxDecoration(
                     color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: Colors.orange.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -370,9 +389,9 @@ class _RecordScreenState extends State<RecordScreen> {
                   ),
                 ),
               ],
-              
+
               const SizedBox(height: 16),
-              
+
               // 제목 입력
               TextFormField(
                 controller: _titleController,
@@ -390,9 +409,9 @@ class _RecordScreenState extends State<RecordScreen> {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // 본문 입력
               TextFormField(
                 controller: _contentController,
@@ -406,9 +425,9 @@ class _RecordScreenState extends State<RecordScreen> {
                   alignLabelWithHint: true,
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // 감정 선택
               Text(
                 '오늘의 기분',
@@ -416,15 +435,15 @@ class _RecordScreenState extends State<RecordScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               SizedBox(
                 height: 70,
                 child: Row(
                   children: Emotion.values.map((emotion) {
                     final isSelected = _selectedEmotion == emotion;
-                    
+
                     return Expanded(
                       child: GestureDetector(
                         onTap: () {
@@ -434,32 +453,38 @@ class _RecordScreenState extends State<RecordScreen> {
                         },
                         child: Container(
                           margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: isSelected 
-                            ? emotion.color.withValues(alpha: 0.2)
-                            : theme.colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected 
-                              ? emotion.color 
-                              : theme.dividerColor,
-                            width: 2,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? emotion.color.withValues(alpha: 0.2)
+                                : theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? emotion.color
+                                  : theme.dividerColor,
+                              width: 2,
+                            ),
                           ),
-                        ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 emotion.fallbackIcon,
                                 size: 24,
-                                color: isSelected ? emotion.color : theme.colorScheme.onSurface,
+                                color: isSelected
+                                    ? emotion.color
+                                    : theme.colorScheme.onSurface,
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 emotion.displayName,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: isSelected ? emotion.color : theme.colorScheme.onSurface,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color: isSelected
+                                      ? emotion.color
+                                      : theme.colorScheme.onSurface,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                   fontSize: 10,
                                 ),
                                 textAlign: TextAlign.center,
@@ -472,9 +497,9 @@ class _RecordScreenState extends State<RecordScreen> {
                   }).toList(),
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // 스티커 선택
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -492,20 +517,25 @@ class _RecordScreenState extends State<RecordScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               if (_selectedStickers.isNotEmpty) ...[
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: _selectedStickers.map((stickerType) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: stickerType.color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: stickerType.color.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: stickerType.color.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -543,9 +573,9 @@ class _RecordScreenState extends State<RecordScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
-              
+
               const SizedBox(height: 8),
-              
+
               // 사진 첨부
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -563,9 +593,9 @@ class _RecordScreenState extends State<RecordScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               if (_selectedImage != null) ...[
                 Stack(
                   children: [
@@ -586,7 +616,9 @@ class _RecordScreenState extends State<RecordScreen> {
                                 return const SizedBox(
                                   width: double.infinity,
                                   height: 200,
-                                  child: Center(child: CircularProgressIndicator()),
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
                                 );
                               },
                             )
@@ -632,7 +664,7 @@ class _RecordScreenState extends State<RecordScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;

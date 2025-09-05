@@ -5,7 +5,7 @@ import 'package:baseball_diary2/models/sticker_data.dart';
 void main() {
   group('StickerType Enum Tests', () {
     test('should have correct number of sticker types', () {
-      expect(StickerType.values.length, 13);
+      expect(StickerType.values.length, 14);
     });
 
     test('should have all expected sticker types', () {
@@ -14,6 +14,12 @@ void main() {
       expect(StickerType.values, contains(StickerType.victory));
       expect(StickerType.values, contains(StickerType.defeat));
       expect(StickerType.values, contains(StickerType.draw));
+
+      // 날씨 관련
+      expect(StickerType.values, contains(StickerType.sunny));
+      expect(StickerType.values, contains(StickerType.cloudy));
+      expect(StickerType.values, contains(StickerType.rainy));
+      expect(StickerType.values, contains(StickerType.snowy));
 
       // 활동 관련
       expect(StickerType.values, contains(StickerType.practice));
@@ -26,7 +32,7 @@ void main() {
       expect(StickerType.values, contains(StickerType.steal));
 
       // 기타
-      expect(StickerType.values, contains(StickerType.rain));
+      expect(StickerType.values, contains(StickerType.rainy));
       expect(StickerType.values, contains(StickerType.postponed));
       expect(StickerType.values, contains(StickerType.special));
     });
@@ -64,7 +70,7 @@ void main() {
 
     test('should return all types list', () {
       final allTypes = StickerType.getAllTypes();
-      expect(allTypes.length, 13);
+      expect(allTypes.length, 14);
       expect(allTypes, containsAll(StickerType.values));
     });
 
@@ -74,16 +80,17 @@ void main() {
         StickerType.watch,
         StickerType.victory,
         StickerType.defeat,
-        StickerType.draw
+        StickerType.draw,
       ]);
     });
 
     test('should return correct activity types', () {
       final activityTypes = StickerType.getActivityTypes();
       expect(activityTypes, [
-        StickerType.practice,
-        StickerType.training,
-        StickerType.analysis
+        StickerType.sunny,
+        StickerType.cloudy,
+        StickerType.rainy,
+        StickerType.snowy,
       ]);
     });
 
@@ -92,7 +99,7 @@ void main() {
       expect(specialTypes, [
         StickerType.homerun,
         StickerType.strikeout,
-        StickerType.steal
+        StickerType.steal,
       ]);
     });
 
@@ -149,7 +156,7 @@ void main() {
 
     test('should convert StickerData to JSON correctly', () {
       final json = testStickerData.toJson();
-      
+
       expect(json, {
         'id': 'sticker-123',
         'type': 'victory',
@@ -164,12 +171,12 @@ void main() {
     test('should convert StickerData to JSON with null values', () {
       final stickerWithNulls = StickerData(
         id: 'sticker-789',
-        type: StickerType.rain,
+        type: StickerType.rainy,
         date: testDate,
       );
 
       final json = stickerWithNulls.toJson();
-      
+
       expect(json['memo'], isNull);
       expect(json['teamId'], isNull);
       expect(json['positionX'], 0.5);
@@ -227,7 +234,13 @@ void main() {
     });
 
     test('should implement isSameDate correctly', () {
-      final sameDate = DateTime(2024, 1, 15, 15, 45); // Same day, different time
+      final sameDate = DateTime(
+        2024,
+        1,
+        15,
+        15,
+        45,
+      ); // Same day, different time
       final differentDate = DateTime(2024, 1, 16, 10, 30);
 
       expect(testStickerData.isSameDate(sameDate), true);
@@ -275,7 +288,7 @@ void main() {
 
     test('should have proper toString representation', () {
       final toString = testStickerData.toString();
-      
+
       expect(toString, contains('StickerData{'));
       expect(toString, contains('id: sticker-123'));
       expect(toString, contains('type: StickerType.victory'));
@@ -299,7 +312,7 @@ void main() {
 
       final stickerWithoutTeam = StickerData(
         id: 'test2',
-        type: StickerType.rain,
+        type: StickerType.rainy,
         date: testDate,
       );
 
@@ -351,7 +364,7 @@ void main() {
 
       final nonSpecialSticker = StickerData(
         id: 'test2',
-        type: StickerType.rain,
+        type: StickerType.rainy,
         date: testDate,
       );
 

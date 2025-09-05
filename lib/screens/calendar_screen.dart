@@ -6,7 +6,9 @@ import '../controllers/calendar_controller.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../models/sticker_data.dart';
+import '../services/team_selection_helper.dart';
 import '../widgets/sticker_selection_modal.dart';
+import '../widgets/team_info_widget.dart';
 import 'diary_detail_screen.dart';
 import 'record_screen.dart';
 
@@ -46,6 +48,9 @@ class CalendarScreen extends StatelessWidget {
       DiaryEntry entryToUpdate;
       
       if (entries.isEmpty) {
+        // 선택된 팀 ID 가져오기 (없으면 기본값 1 사용)
+        final selectedTeamId = await TeamSelectionHelper.getSelectedTeamId() ?? 1;
+        
         // 기록이 없으면 새 기록 생성
         entryToUpdate = DiaryEntry(
           id: '${DateTime.now().millisecondsSinceEpoch}',
@@ -53,7 +58,7 @@ class CalendarScreen extends StatelessWidget {
           content: '',
           emotion: Emotion.neutral,
           date: selectedDate,
-          teamId: 1,
+          teamId: selectedTeamId,
           stickers: stickerTypes,
         );
         await controller.addNewDiaryEntry(entryToUpdate);
@@ -291,6 +296,11 @@ class CalendarScreen extends StatelessWidget {
               centerTitle: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
+              leading: const Padding(
+                padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0, right: 8.0),
+                child: TeamInfoWidget(),
+              ),
+              automaticallyImplyLeading: false,
             ),
             body: Column(
               children: [
