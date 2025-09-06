@@ -88,19 +88,19 @@ class HomeScreen extends StatelessWidget {
     showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: const Text('로그아웃'),
+        content: const Text('정말로 로그아웃하시겠습니까?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('취소'),
           ),
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop(true);
               await AuthService().signOut();
             },
-            child: const Text('Sign Out'),
+            child: const Text('로그아웃'),
           ),
         ],
       ),

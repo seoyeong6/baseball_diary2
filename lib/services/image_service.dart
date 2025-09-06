@@ -39,7 +39,6 @@ class ImageService {
       }
 
       if (compressedData == null) {
-        debugPrint('Failed to get image data');
         return null;
       }
 
@@ -57,7 +56,6 @@ class ImageService {
       
       return downloadUrl;
     } catch (e) {
-      debugPrint('Error uploading image to Firebase: $e');
       return null;
     }
   }
@@ -68,7 +66,6 @@ class ImageService {
       await ref.delete();
       return true;
     } catch (e) {
-      debugPrint('Error deleting image from Firebase: $e');
       return false;
     }
   }
@@ -106,7 +103,6 @@ class ImageService {
       
       return null;
     } catch (e) {
-      debugPrint('Error compressing image: $e');
       return null;
     }
   }
@@ -126,7 +122,6 @@ class ImageService {
         format: CompressFormat.jpeg,
       );
     } catch (e) {
-      debugPrint('Error compressing image data: $e');
       return null;
     }
   }
@@ -138,7 +133,6 @@ class ImageService {
         await file.delete();
       }
     } catch (e) {
-      debugPrint('Error deleting image: $e');
     }
   }
 
@@ -151,7 +145,6 @@ class ImageService {
         await imagesDir.delete(recursive: true);
       }
     } catch (e) {
-      debugPrint('Error clearing image cache: $e');
     }
   }
 
@@ -174,7 +167,6 @@ class ImageService {
       
       return totalSize;
     } catch (e) {
-      debugPrint('Error calculating cache size: $e');
       return 0;
     }
   }

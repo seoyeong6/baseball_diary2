@@ -47,11 +47,36 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!result.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result.error ?? 'Sign in failed'),
+            content: Text(result.error ?? '로그인에 실패했습니다'),
             backgroundColor: Colors.red,
           ),
         );
       }
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    if (_emailController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('이메일을 입력해주세요'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final result = await AuthService().resetPassword(_emailController.text.trim());
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.success 
+            ? '비밀번호 재설정 이메일을 보냈습니다' 
+            : result.error ?? '비밀번호 재설정에 실패했습니다'),
+          backgroundColor: result.success ? Colors.green : Colors.red,
+        ),
+      );
     }
   }
 
@@ -160,18 +185,29 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: _resetPassword,
+                  child: Text(
+                    '비밀번호를 잊으셨나요?',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account? ",
+                      "계정이 없으신가요? ",
                       style: theme.textTheme.bodyMedium,
                     ),
                     GestureDetector(
                       onTap: widget.onSignUpTap,
                       child: Text(
-                        'Sign Up',
+                        '회원가입',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,

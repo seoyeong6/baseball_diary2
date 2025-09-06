@@ -53,7 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!result.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result.error ?? 'Sign up failed'),
+            content: Text(result.error ?? '회원가입에 실패했습니다'),
             backgroundColor: Colors.red,
           ),
         );

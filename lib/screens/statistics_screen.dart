@@ -44,7 +44,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading statistics data: $e');
     }
   }
 
@@ -193,17 +192,17 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   children: [
                     Expanded(
                       child: _StatCard(
-                        title: '평균 스티커 수',
-                        value: '$avgDailyActivity개',
-                        icon: Icons.trending_up,
+                        title: '이번 달',
+                        value: '$thisMonthEntries',
+                        icon: Icons.calendar_month,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _StatCard(
-                        title: '이번 달',
-                        value: '$thisMonthEntries',
-                        icon: Icons.calendar_month,
+                        title: '평균 스티커 수',
+                        value: '$avgDailyActivity개',
+                        icon: Icons.trending_up,
                       ),
                     ),
                   ],

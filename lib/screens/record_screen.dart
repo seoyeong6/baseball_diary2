@@ -75,7 +75,6 @@ class _RecordScreenState extends State<RecordScreen> {
         _hasExistingEntryOnDate = existingEntries.isNotEmpty;
       });
     } catch (e) {
-      debugPrint('Error checking existing entry: $e');
     }
   }
 
@@ -101,7 +100,6 @@ class _RecordScreenState extends State<RecordScreen> {
         });
       }
     } catch (e) {
-      debugPrint('Error picking image: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -210,7 +208,6 @@ class _RecordScreenState extends State<RecordScreen> {
         imagePath: firebaseImageUrl ?? widget.existingEntry?.imagePath,
       );
 
-      debugPrint('Saving entry: ${entry.toString()}');
 
       if (mounted) {
         // CalendarController를 통해 저장 및 캐시 업데이트
@@ -224,7 +221,6 @@ class _RecordScreenState extends State<RecordScreen> {
           await calendarController.addNewDiaryEntry(entry);
         }
 
-        debugPrint('Entry saved successfully');
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -234,7 +230,6 @@ class _RecordScreenState extends State<RecordScreen> {
             duration: const Duration(seconds: 2),
           ),
         );
-        debugPrint('Navigating to detail screen...');
 
         // 저장된 기록의 상세보기로 이동
         Navigator.pushReplacement(
@@ -245,7 +240,6 @@ class _RecordScreenState extends State<RecordScreen> {
         );
       }
     } catch (e) {
-      debugPrint('Error saving entry: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

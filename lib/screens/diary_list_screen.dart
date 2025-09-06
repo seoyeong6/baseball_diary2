@@ -85,7 +85,6 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('Error loading diary entries: $e');
       setState(() {
         _isLoading = false;
       });
@@ -151,7 +150,6 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
         );
       }
     } catch (e) {
-      debugPrint('Error deleting entry: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

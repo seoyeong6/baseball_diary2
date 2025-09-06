@@ -49,7 +49,6 @@ class DiaryService extends ChangeNotifier {
       _isInitialized = true;
     } catch (e) {
       _lastError = '서비스 초기화 실패: $e';
-      debugPrint('DiaryService initialization error: $e');
     }
 
     _isLoading = false;
@@ -62,7 +61,6 @@ class DiaryService extends ChangeNotifier {
       // Firebase 연결 상태 확인
       final isConnected = await _firebaseService.isConnected();
       if (!isConnected) {
-        debugPrint('Firebase not connected, using local storage only');
         return;
       }
 
@@ -73,7 +71,6 @@ class DiaryService extends ChangeNotifier {
       // Firebase와 동기화
       await _firebaseService.syncWithLocal(localDiaryEntries, localStickerData);
     } catch (e) {
-      debugPrint('Cloud sync failed: $e');
       // 동기화 실패는 치명적 오류가 아니므로 계속 진행
     }
   }
@@ -340,7 +337,6 @@ class DiaryService extends ChangeNotifier {
       await _attemptCloudSync();
     } catch (e) {
       _lastError = '로그인 후 동기화에 실패했습니다: $e';
-      debugPrint('Sign-in sync error: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -372,7 +368,6 @@ class DiaryService extends ChangeNotifier {
       }
     } catch (e) {
       _lastError = '로그아웃 시 데이터 백업에 실패했습니다: $e';
-      debugPrint('Sign-out backup error: $e');
     } finally {
       _isLoading = false;
       notifyListeners();

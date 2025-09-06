@@ -8,6 +8,7 @@ import 'package:baseball_diary2/services/auth_service.dart';
 import 'package:baseball_diary2/controllers/calendar_controller.dart';
 import 'package:baseball_diary2/controllers/theme_controller.dart';
 import 'package:baseball_diary2/services/team_selection_helper.dart';
+import 'package:baseball_diary2/screens/auth/auth_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -31,6 +32,7 @@ class _BaseballDiaryAppState extends State<BaseballDiaryApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => CalendarController()),
         ChangeNotifierProvider(create: (context) => ThemeController()),
       ],
@@ -50,36 +52,54 @@ class _BaseballDiaryAppState extends State<BaseballDiaryApp> {
 }
 
 /// 앱 초기화 및 라우팅을 담당하는 위젯
-class AppInitializer extends StatefulWidget {
+class AppInitializer extends StatelessWidget {
   const AppInitializer({super.key});
 
   @override
-  State<AppInitializer> createState() => _AppInitializerState();
-}
-
-class _AppInitializerState extends State<AppInitializer> {
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: TeamSelectionHelper.hasSelectedTeam(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        if (authService.isLoading) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('초기화 중...'),
+                ],
+              ),
+            ),
           );
         }
 
-        final hasSelectedTeam = snapshot.data ?? false;
-
-        if (hasSelectedTeam) {
-          return const MainNavigationScreen();
-        } else {
-          return TeamSelectionScreen(
-            onTeamSelected: (team) {
-              // 팀 선택 시 저장만 하고 테마는 변경하지 않음
-            },
-          );
+        if (!authService.isAuthenticated) {
+          return const AuthScreen();
         }
+
+        return FutureBuilder<bool>(
+          future: TeamSelectionHelper.hasSelectedTeam(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            final hasSelectedTeam = snapshot.data ?? false;
+
+            if (hasSelectedTeam) {
+              return const MainNavigationScreen();
+            } else {
+              return TeamSelectionScreen(
+                onTeamSelected: (team) {
+                  // 팀 선택 시 저장만 하고 테마는 변경하지 않음
+                },
+              );
+            }
+          },
+        );
       },
     );
   }

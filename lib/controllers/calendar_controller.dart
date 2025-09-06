@@ -55,7 +55,6 @@ class CalendarController extends ChangeNotifier {
           await _loadEventsForSelectedDay();
           notifyListeners();
         } catch (e) {
-          debugPrint('Error in _onDiaryServiceChanged: $e');
         }
       });
     }
@@ -74,7 +73,6 @@ class CalendarController extends ChangeNotifier {
       await _loadEventsForSelectedDay();
       _isInitialized = true;
     } catch (e) {
-      debugPrint('Error initializing calendar controller: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -96,7 +94,6 @@ class CalendarController extends ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      debugPrint('Error loading calendar data: $e');
     }
   }
 
@@ -104,7 +101,6 @@ class CalendarController extends ChangeNotifier {
     try {
       return await _diaryService.getDiaryEntriesByDate(day);
     } catch (e) {
-      debugPrint('Error loading diary entries for $day: $e');
       return [];
     }
   }
@@ -182,7 +178,6 @@ class CalendarController extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('Error updating diary entry: $e');
       rethrow;
     }
   }
@@ -208,7 +203,6 @@ class CalendarController extends ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      debugPrint('Error adding new diary entry: $e');
       rethrow;
     }
   }
@@ -227,7 +221,6 @@ class CalendarController extends ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      debugPrint('Error deleting diary entry: $e');
       rethrow;
     }
   }

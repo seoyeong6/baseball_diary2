@@ -45,7 +45,6 @@ class FirestoreService implements FirebaseService {
           .map((doc) => DiaryEntry.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      debugPrint('Error getting all diary entries: $e');
       return [];
     }
   }
@@ -62,7 +61,6 @@ class FirestoreService implements FirebaseService {
       }
       return null;
     } catch (e) {
-      debugPrint('Error getting diary entry by ID: $e');
       return null;
     }
   }
@@ -85,7 +83,6 @@ class FirestoreService implements FirebaseService {
           .map((doc) => DiaryEntry.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      debugPrint('Error getting diary entries by date: $e');
       return [];
     }
   }
@@ -111,7 +108,6 @@ class FirestoreService implements FirebaseService {
           .map((doc) => DiaryEntry.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      debugPrint('Error getting diary entries by date range: $e');
       return [];
     }
   }
@@ -130,7 +126,6 @@ class FirestoreService implements FirebaseService {
       await diariesRef.doc(entry.id).set(data);
       debugPrint('Diary entry saved: ${entry.id}');
     } catch (e) {
-      debugPrint('Error saving diary entry: $e');
       rethrow;
     }
   }
@@ -146,7 +141,6 @@ class FirestoreService implements FirebaseService {
       await diariesRef.doc(id).delete();
       debugPrint('Diary entry deleted: $id');
     } catch (e) {
-      debugPrint('Error deleting diary entry: $e');
       rethrow;
     }
   }
@@ -168,7 +162,6 @@ class FirestoreService implements FirebaseService {
       await batch.commit();
       debugPrint('${entries.length} diary entries saved in batch');
     } catch (e) {
-      debugPrint('Error saving diary entries: $e');
       rethrow;
     }
   }
@@ -186,7 +179,6 @@ class FirestoreService implements FirebaseService {
           .map((doc) => StickerData.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      debugPrint('Error getting all sticker data: $e');
       return [];
     }
   }
@@ -203,7 +195,6 @@ class FirestoreService implements FirebaseService {
       }
       return null;
     } catch (e) {
-      debugPrint('Error getting sticker data by ID: $e');
       return null;
     }
   }
@@ -226,7 +217,6 @@ class FirestoreService implements FirebaseService {
           .map((doc) => StickerData.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      debugPrint('Error getting sticker data by date: $e');
       return [];
     }
   }
@@ -246,7 +236,6 @@ class FirestoreService implements FirebaseService {
           .map((doc) => StickerData.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      debugPrint('Error getting sticker data by date range: $e');
       return [];
     }
   }
@@ -271,7 +260,6 @@ class FirestoreService implements FirebaseService {
       await stickersRef.doc(sticker.id).set(data);
       debugPrint('Sticker data saved: ${sticker.id}');
     } catch (e) {
-      debugPrint('Error saving sticker data: $e');
       rethrow;
     }
   }
@@ -287,7 +275,6 @@ class FirestoreService implements FirebaseService {
       await stickersRef.doc(id).delete();
       debugPrint('Sticker data deleted: $id');
     } catch (e) {
-      debugPrint('Error deleting sticker data: $e');
       rethrow;
     }
   }
@@ -309,7 +296,6 @@ class FirestoreService implements FirebaseService {
       await batch.commit();
       debugPrint('${stickerList.length} sticker data saved in batch');
     } catch (e) {
-      debugPrint('Error saving sticker data list: $e');
       rethrow;
     }
   }
@@ -332,7 +318,6 @@ class FirestoreService implements FirebaseService {
       await _auth.signOut();
       debugPrint('User signed out successfully');
     } catch (e) {
-      debugPrint('Error signing out: $e');
       rethrow;
     }
   }
@@ -351,7 +336,6 @@ class FirestoreService implements FirebaseService {
       
       debugPrint('Local data synced with Firestore');
     } catch (e) {
-      debugPrint('Error syncing with local: $e');
       rethrow;
     }
   }
@@ -372,7 +356,6 @@ class FirestoreService implements FirebaseService {
         'downloadedAt': DateTime.now().toIso8601String(),
       };
     } catch (e) {
-      debugPrint('Error downloading data from Firestore: $e');
       rethrow;
     }
   }
@@ -396,7 +379,6 @@ class FirestoreService implements FirebaseService {
 
       debugPrint('Data uploaded to Firestore: ${diaryEntries.length} diaries, ${stickerData.length} stickers');
     } catch (e) {
-      debugPrint('Error uploading data to Firestore: $e');
       rethrow;
     }
   }
@@ -433,7 +415,6 @@ class FirestoreService implements FirebaseService {
       await batch.commit();
       debugPrint('All user data cleared from Firestore');
     } catch (e) {
-      debugPrint('Error clearing user data: $e');
       rethrow;
     }
   }
@@ -445,7 +426,6 @@ class FirestoreService implements FirebaseService {
       await _firestore.collection('_connection_test').limit(1).get();
       return true;
     } catch (e) {
-      debugPrint('Firestore connection test failed: $e');
       return false;
     }
   }
@@ -499,7 +479,6 @@ class FirestoreService implements FirebaseService {
       
       return data;
     } catch (e) {
-      debugPrint('Error creating data backup: $e');
       rethrow;
     }
   }
@@ -534,7 +513,6 @@ class FirestoreService implements FirebaseService {
 
       debugPrint('Data restored from backup successfully');
     } catch (e) {
-      debugPrint('Error restoring from backup: $e');
       rethrow;
     }
   }

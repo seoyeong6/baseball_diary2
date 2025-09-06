@@ -28,7 +28,6 @@ class ThemeController extends ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      debugPrint('Error loading theme mode: $e');
     }
   }
 
@@ -53,7 +52,6 @@ class ThemeController extends ChangeNotifier {
       
       await prefs.setString('theme_mode', modeString);
     } catch (e) {
-      debugPrint('Error saving theme mode: $e');
     }
   }
 

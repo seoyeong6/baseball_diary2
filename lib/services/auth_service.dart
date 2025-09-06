@@ -1,43 +1,57 @@
-import 'dart:convert';
-import 'dart:math';
-import 'package:crypto/crypto.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import '../models/user.dart';
+import '../models/user.dart' as app_user;
 
 class AuthService extends ChangeNotifier {
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
   AuthService._internal();
 
-  User? _currentUser;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  app_user.User? _currentUser;
   bool _isLoading = false;
 
-  User? get currentUser => _currentUser;
+  app_user.User? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
-
-  static const String _userKey = 'current_user';
-  static const String _usersKey = 'registered_users';
 
   Future<void> initialize() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userJson = prefs.getString(_userKey);
+      // Firebase Auth 상태 변경 감지
+      _auth.authStateChanges().listen(_onAuthStateChanged);
       
-      if (userJson != null) {
-        final userData = jsonDecode(userJson);
-        _currentUser = User.fromJson(userData);
+      // 현재 로그인된 사용자 확인
+      final firebaseUser = _auth.currentUser;
+      if (firebaseUser != null) {
+        _currentUser = _firebaseUserToAppUser(firebaseUser);
       }
     } catch (e) {
-      debugPrint('Error initializing auth service: $e');
+      // Firebase 초기화 오류 처리
     }
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  void _onAuthStateChanged(User? firebaseUser) {
+    if (firebaseUser != null) {
+      _currentUser = _firebaseUserToAppUser(firebaseUser);
+    } else {
+      _currentUser = null;
+    }
+    notifyListeners();
+  }
+
+  app_user.User _firebaseUserToAppUser(User firebaseUser) {
+    return app_user.User(
+      id: firebaseUser.uid,
+      email: firebaseUser.email ?? '',
+      name: firebaseUser.displayName ?? firebaseUser.email?.split('@')[0] ?? 'User',
+      createdAt: firebaseUser.metadata.creationTime ?? DateTime.now(),
+    );
   }
 
   Future<AuthResult> signUp({
@@ -49,40 +63,33 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final existingUsers = await _getRegisteredUsers();
-
-      if (existingUsers.any((userRecord) => userRecord['user']['email'] == email)) {
-        _isLoading = false;
-        notifyListeners();
-        return AuthResult.failure('User with this email already exists');
-      }
-
-      final hashedPassword = _hashPassword(password);
-      final userId = _generateUserId();
-      
-      final newUser = User(
-        id: userId,
+      // Firebase로 계정 생성
+      final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
-        name: name,
-        createdAt: DateTime.now(),
+        password: password,
       );
 
-      existingUsers.add({
-        'user': newUser.toJson(),
-        'password': hashedPassword,
-      });
+      // 사용자 프로필 업데이트 (displayName 설정)
+      await credential.user?.updateDisplayName(name);
+      await credential.user?.reload();
 
-      await prefs.setString(_usersKey, jsonEncode(existingUsers));
-      await _setCurrentUser(newUser);
+      // 현재 사용자 정보 업데이트
+      final updatedUser = _auth.currentUser;
+      if (updatedUser != null) {
+        _currentUser = _firebaseUserToAppUser(updatedUser);
+      }
 
       _isLoading = false;
       notifyListeners();
-      return AuthResult.success(newUser);
+      return AuthResult.success(_currentUser!);
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return AuthResult.failure(_getAuthErrorMessage(e));
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return AuthResult.failure('Sign up failed: $e');
+      return AuthResult.failure('회원가입에 실패했습니다: $e');
     }
   }
 
@@ -94,30 +101,23 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final existingUsers = await _getRegisteredUsers();
-      final hashedPassword = _hashPassword(password);
-
-      final userRecord = existingUsers.firstWhere(
-        (record) => record['user']['email'] == email && record['password'] == hashedPassword,
-        orElse: () => {},
+      await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      if (userRecord.isEmpty) {
-        _isLoading = false;
-        notifyListeners();
-        return AuthResult.failure('Invalid email or password');
-      }
-
-      final user = User.fromJson(userRecord['user']);
-      await _setCurrentUser(user);
-
+      // 현재 사용자 정보 업데이트 (authStateChanges에서 자동으로 처리됨)
       _isLoading = false;
       notifyListeners();
-      return AuthResult.success(user);
+      return AuthResult.success(_currentUser!);
+    } on FirebaseAuthException catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return AuthResult.failure(_getAuthErrorMessage(e));
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return AuthResult.failure('Sign in failed: $e');
+      return AuthResult.failure('로그인에 실패했습니다: $e');
     }
   }
 
@@ -126,53 +126,55 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_userKey);
+      await _auth.signOut();
       _currentUser = null;
     } catch (e) {
-      debugPrint('Error signing out: $e');
+      // Firebase 로그아웃 오류 처리
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> _setCurrentUser(User user) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode(user.toJson()));
-    _currentUser = user;
-  }
-
-  Future<List<Map<String, dynamic>>> _getRegisteredUsers() async {
-    final prefs = await SharedPreferences.getInstance();
-    final usersJson = prefs.getString(_usersKey);
-    
-    if (usersJson == null) {
-      return [];
+  Future<AuthResult> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return AuthResult.success(null);
+    } on FirebaseAuthException catch (e) {
+      return AuthResult.failure(_getAuthErrorMessage(e));
+    } catch (e) {
+      return AuthResult.failure('비밀번호 재설정에 실패했습니다: $e');
     }
-
-    final usersData = jsonDecode(usersJson) as List;
-    return usersData.cast<Map<String, dynamic>>();
   }
 
-  String _hashPassword(String password) {
-    const salt = 'baseball_diary_salt';
-    final bytes = utf8.encode(password + salt);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
-  String _generateUserId() {
-    final random = Random();
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    return List.generate(12, (index) => chars[random.nextInt(chars.length)]).join();
+  String _getAuthErrorMessage(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'weak-password':
+        return '비밀번호가 너무 약합니다.';
+      case 'email-already-in-use':
+        return '이미 사용 중인 이메일입니다.';
+      case 'invalid-email':
+        return '유효하지 않은 이메일 주소입니다.';
+      case 'user-not-found':
+        return '등록되지 않은 이메일입니다.';
+      case 'wrong-password':
+        return '잘못된 비밀번호입니다.';
+      case 'invalid-credential':
+        return '이메일 또는 비밀번호가 올바르지 않습니다.';
+      case 'too-many-requests':
+        return '너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.';
+      case 'network-request-failed':
+        return '네트워크 연결을 확인해주세요.';
+      default:
+        return e.message ?? '알 수 없는 오류가 발생했습니다.';
+    }
   }
 }
 
 class AuthResult {
   final bool success;
   final String? error;
-  final User? user;
+  final app_user.User? user;
 
   const AuthResult._({
     required this.success,
@@ -180,7 +182,7 @@ class AuthResult {
     this.user,
   });
 
-  factory AuthResult.success(User user) {
+  factory AuthResult.success(app_user.User? user) {
     return AuthResult._(success: true, user: user);
   }
 

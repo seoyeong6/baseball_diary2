@@ -83,7 +83,6 @@ class CalendarScreen extends StatelessWidget {
         );
       }
     } catch (e) {
-      debugPrint('Error adding sticker: $e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
