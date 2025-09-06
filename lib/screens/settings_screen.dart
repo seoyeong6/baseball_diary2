@@ -9,6 +9,7 @@ import '../services/diary_service.dart';
 import '../models/team.dart';
 import '../controllers/theme_controller.dart';
 import '../widgets/team_info_widget.dart';
+import '../services/auth_service.dart';
 import 'team_selection_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -306,6 +307,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           _buildDivider(context),
 
+          // 계정 설정 섹션
+          _buildSectionHeader(context, '계정 설정'),
+          ListTile(
+            title: const Text(
+              '로그아웃',
+              style: TextStyle(color: Colors.red),
+            ),
+            subtitle: const Text('현재 계정에서 로그아웃'),
+            leading: const Icon(
+              Icons.logout,
+              color: Colors.red,
+            ),
+            trailing: const Icon(
+              Icons.chevron_right,
+              color: Colors.red,
+            ),
+            onTap: _logout,
+          ),
+
+          _buildDivider(context),
+
           // 앱 정보 섹션
           _buildSectionHeader(context, '앱 정보'),
           const ListTile(
@@ -321,6 +343,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _logout() async {
+    // 확인 대화상자 표시
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('로그아웃'),
+        content: const Text('정말로 로그아웃하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('로그아웃'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // AuthService를 통해 로그아웃
+      final authService = AuthService();
+      await authService.signOut();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('로그아웃되었습니다'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('로그아웃 중 오류가 발생했습니다: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Widget _buildSectionHeader(BuildContext context, String title) {

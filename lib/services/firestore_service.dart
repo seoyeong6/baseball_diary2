@@ -38,13 +38,17 @@ class FirestoreService implements FirebaseService {
   Future<List<DiaryEntry>> getAllDiaryEntries() async {
     try {
       final diariesRef = _getUserDiariesRef();
-      if (diariesRef == null) return [];
+      if (diariesRef == null) {
+        debugPrint('Warning: User not authenticated, returning empty list');
+        return [];
+      }
 
       final querySnapshot = await diariesRef.get();
       return querySnapshot.docs
           .map((doc) => DiaryEntry.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
+      debugPrint('Error getting all diary entries: $e');
       return [];
     }
   }
@@ -53,14 +57,19 @@ class FirestoreService implements FirebaseService {
   Future<DiaryEntry?> getDiaryEntryById(String id) async {
     try {
       final diariesRef = _getUserDiariesRef();
-      if (diariesRef == null) return null;
+      if (diariesRef == null) {
+        debugPrint('Warning: User not authenticated for getDiaryEntryById');
+        return null;
+      }
 
       final docSnapshot = await diariesRef.doc(id).get();
       if (docSnapshot.exists && docSnapshot.data() != null) {
         return DiaryEntry.fromJson({...docSnapshot.data()!, 'id': docSnapshot.id});
       }
+      debugPrint('Diary entry not found with ID: $id');
       return null;
     } catch (e) {
+      debugPrint('Error getting diary entry by ID $id: $e');
       return null;
     }
   }
@@ -69,7 +78,10 @@ class FirestoreService implements FirebaseService {
   Future<List<DiaryEntry>> getDiaryEntriesByDate(DateTime date) async {
     try {
       final diariesRef = _getUserDiariesRef();
-      if (diariesRef == null) return [];
+      if (diariesRef == null) {
+        debugPrint('Warning: User not authenticated for getDiaryEntriesByDate');
+        return [];
+      }
 
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
@@ -83,6 +95,7 @@ class FirestoreService implements FirebaseService {
           .map((doc) => DiaryEntry.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
+      debugPrint('Error getting diary entries by date ${date.toIso8601String()}: $e');
       return [];
     }
   }
@@ -97,7 +110,10 @@ class FirestoreService implements FirebaseService {
   Future<List<DiaryEntry>> getDiaryEntriesByDateRange(DateTime startDate, DateTime endDate) async {
     try {
       final diariesRef = _getUserDiariesRef();
-      if (diariesRef == null) return [];
+      if (diariesRef == null) {
+        debugPrint('Warning: User not authenticated for getDiaryEntriesByDateRange');
+        return [];
+      }
 
       final querySnapshot = await diariesRef
           .where('date', isGreaterThanOrEqualTo: startDate.toIso8601String())
@@ -108,6 +124,7 @@ class FirestoreService implements FirebaseService {
           .map((doc) => DiaryEntry.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
+      debugPrint('Error getting diary entries by date range ${startDate.toIso8601String()} - ${endDate.toIso8601String()}: $e');
       return [];
     }
   }
@@ -126,6 +143,47 @@ class FirestoreService implements FirebaseService {
       await diariesRef.doc(entry.id).set(data);
       debugPrint('Diary entry saved: ${entry.id}');
     } catch (e) {
+      debugPrint('Error saving diary entry: $e');
+      rethrow;
+    }
+  }
+
+  /// 다이어리 엔트리의 특정 필드만 업데이트
+  Future<void> updateDiaryEntry(String id, Map<String, dynamic> updates) async {
+    try {
+      final diariesRef = _getUserDiariesRef();
+      if (diariesRef == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // ID 필드가 포함되어 있으면 제거
+      final updateData = Map<String, dynamic>.from(updates);
+      updateData.remove('id');
+
+      await diariesRef.doc(id).update(updateData);
+      debugPrint('Diary entry updated: $id');
+    } catch (e) {
+      debugPrint('Error updating diary entry: $e');
+      rethrow;
+    }
+  }
+
+  /// 새로운 다이어리 엔트리 생성 (자동 ID 생성)
+  Future<String> createDiaryEntry(DiaryEntry entry) async {
+    try {
+      final diariesRef = _getUserDiariesRef();
+      if (diariesRef == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final data = entry.toJson();
+      data.remove('id');
+
+      final docRef = await diariesRef.add(data);
+      debugPrint('Diary entry created with ID: ${docRef.id}');
+      return docRef.id;
+    } catch (e) {
+      debugPrint('Error creating diary entry: $e');
       rethrow;
     }
   }
@@ -172,13 +230,17 @@ class FirestoreService implements FirebaseService {
   Future<List<StickerData>> getAllStickerData() async {
     try {
       final stickersRef = _getUserStickersRef();
-      if (stickersRef == null) return [];
+      if (stickersRef == null) {
+        debugPrint('Warning: User not authenticated, returning empty sticker list');
+        return [];
+      }
 
       final querySnapshot = await stickersRef.get();
       return querySnapshot.docs
           .map((doc) => StickerData.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
+      debugPrint('Error getting all sticker data: $e');
       return [];
     }
   }
@@ -187,14 +249,19 @@ class FirestoreService implements FirebaseService {
   Future<StickerData?> getStickerDataById(String id) async {
     try {
       final stickersRef = _getUserStickersRef();
-      if (stickersRef == null) return null;
+      if (stickersRef == null) {
+        debugPrint('Warning: User not authenticated for getStickerDataById');
+        return null;
+      }
 
       final docSnapshot = await stickersRef.doc(id).get();
       if (docSnapshot.exists && docSnapshot.data() != null) {
         return StickerData.fromJson({...docSnapshot.data()!, 'id': docSnapshot.id});
       }
+      debugPrint('Sticker data not found with ID: $id');
       return null;
     } catch (e) {
+      debugPrint('Error getting sticker data by ID $id: $e');
       return null;
     }
   }
@@ -203,7 +270,10 @@ class FirestoreService implements FirebaseService {
   Future<List<StickerData>> getStickerDataByDate(DateTime date) async {
     try {
       final stickersRef = _getUserStickersRef();
-      if (stickersRef == null) return [];
+      if (stickersRef == null) {
+        debugPrint('Warning: User not authenticated for getStickerDataByDate');
+        return [];
+      }
 
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
@@ -217,6 +287,7 @@ class FirestoreService implements FirebaseService {
           .map((doc) => StickerData.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
+      debugPrint('Error getting sticker data by date ${date.toIso8601String()}: $e');
       return [];
     }
   }
@@ -225,7 +296,10 @@ class FirestoreService implements FirebaseService {
   Future<List<StickerData>> getStickerDataByDateRange(DateTime startDate, DateTime endDate) async {
     try {
       final stickersRef = _getUserStickersRef();
-      if (stickersRef == null) return [];
+      if (stickersRef == null) {
+        debugPrint('Warning: User not authenticated for getStickerDataByDateRange');
+        return [];
+      }
 
       final querySnapshot = await stickersRef
           .where('date', isGreaterThanOrEqualTo: startDate.toIso8601String())
@@ -236,6 +310,7 @@ class FirestoreService implements FirebaseService {
           .map((doc) => StickerData.fromJson({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
+      debugPrint('Error getting sticker data by date range ${startDate.toIso8601String()} - ${endDate.toIso8601String()}: $e');
       return [];
     }
   }
@@ -260,6 +335,47 @@ class FirestoreService implements FirebaseService {
       await stickersRef.doc(sticker.id).set(data);
       debugPrint('Sticker data saved: ${sticker.id}');
     } catch (e) {
+      debugPrint('Error saving sticker data: $e');
+      rethrow;
+    }
+  }
+
+  /// 스티커 데이터의 특정 필드만 업데이트
+  Future<void> updateStickerData(String id, Map<String, dynamic> updates) async {
+    try {
+      final stickersRef = _getUserStickersRef();
+      if (stickersRef == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // ID 필드가 포함되어 있으면 제거
+      final updateData = Map<String, dynamic>.from(updates);
+      updateData.remove('id');
+
+      await stickersRef.doc(id).update(updateData);
+      debugPrint('Sticker data updated: $id');
+    } catch (e) {
+      debugPrint('Error updating sticker data: $e');
+      rethrow;
+    }
+  }
+
+  /// 새로운 스티커 데이터 생성 (자동 ID 생성)
+  Future<String> createStickerData(StickerData sticker) async {
+    try {
+      final stickersRef = _getUserStickersRef();
+      if (stickersRef == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final data = sticker.toJson();
+      data.remove('id');
+
+      final docRef = await stickersRef.add(data);
+      debugPrint('Sticker data created with ID: ${docRef.id}');
+      return docRef.id;
+    } catch (e) {
+      debugPrint('Error creating sticker data: $e');
       rethrow;
     }
   }

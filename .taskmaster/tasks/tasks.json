@@ -668,7 +668,7 @@
               "9.3"
             ],
             "details": "Firestore에서 데이터 생성, 읽기, 업데이트, 삭제 기능 구현",
-            "status": "in-progress"
+            "status": "done"
           },
           {
             "id": 5,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-09-04T03:50:07.281Z",
+      "updated": "2025-09-06T05:33:56.998Z",
       "description": "Tasks for master context"
     }
   }

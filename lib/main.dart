@@ -74,6 +74,7 @@ class AppInitializer extends StatelessWidget {
           );
         }
 
+        // 인증되지 않은 경우 AuthScreen으로 리다이렉트
         if (!authService.isAuthenticated) {
           return const AuthScreen();
         }

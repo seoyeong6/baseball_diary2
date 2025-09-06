@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:baseball_diary2/widgets/nav_tab.dart';
-import 'package:baseball_diary2/home_screen/home_screen.dart';
 import 'package:baseball_diary2/screens/calendar_screen.dart';
 import 'package:baseball_diary2/screens/record_screen.dart';
 import 'package:baseball_diary2/screens/settings_screen.dart';
 import 'package:baseball_diary2/screens/diary_list_screen.dart';
 import 'package:baseball_diary2/screens/statistics_screen.dart';
+import 'package:baseball_diary2/services/auth_service.dart';
+import 'package:baseball_diary2/screens/auth/auth_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -34,7 +36,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    // 인증 상태 재확인 - 만약 인증이 해제되면 AuthScreen으로 리다이렉트
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        if (!authService.isAuthenticated) {
+          return const AuthScreen();
+        }
+        
+        return Scaffold(
       body: Stack(
         children: [
           Offstage(
@@ -103,6 +112,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }
