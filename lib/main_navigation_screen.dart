@@ -1,73 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:baseball_diary2/widgets/nav_tab.dart';
-import 'package:baseball_diary2/screens/calendar_screen.dart';
-import 'package:baseball_diary2/screens/record_screen.dart';
-import 'package:baseball_diary2/screens/settings_screen.dart';
-import 'package:baseball_diary2/screens/diary_list_screen.dart';
-import 'package:baseball_diary2/screens/statistics_screen.dart';
-import 'package:baseball_diary2/services/auth_service.dart';
-import 'package:baseball_diary2/screens/auth/auth_screen.dart';
+import 'package:baseball_diary2/routing/app_routes.dart';
 
-class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+class MainNavigationScreen extends StatelessWidget {
+  const MainNavigationScreen({super.key, required this.child});
 
-  @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
-}
+  final Widget child;
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _selectedIndex = 0;
+  int _getCurrentIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).matchedLocation;
+    switch (location) {
+      case AppRoutes.calendar:
+        return 0;
+      case AppRoutes.diary:
+        return 1;
+      case AppRoutes.record:
+        return 2;
+      case AppRoutes.statistics:
+        return 3;
+      case AppRoutes.settings:
+        return 4;
+      default:
+        return 0;
+    }
+  }
 
-  final screens = [
-    const CalendarScreen(),
-    const DiaryListScreen(),
-    const RecordScreen(),
-    const StatisticsScreen(),
-    const SettingsScreen(),
-  ];
-
-  void _onTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _onTap(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.go(AppRoutes.calendar);
+        break;
+      case 1:
+        context.go(AppRoutes.diary);
+        break;
+      case 2:
+        context.go(AppRoutes.record);
+        break;
+      case 3:
+        context.go(AppRoutes.statistics);
+        break;
+      case 4:
+        context.go(AppRoutes.settings);
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // 인증 상태 재확인 - 만약 인증이 해제되면 AuthScreen으로 리다이렉트
-    return Consumer<AuthService>(
-      builder: (context, authService, child) {
-        if (!authService.isAuthenticated) {
-          return const AuthScreen();
-        }
-        
-        return Scaffold(
-      body: Stack(
-        children: [
-          Offstage(
-            offstage: _selectedIndex != 0,
-            child: screens[0],
-          ),
-          Offstage(
-            offstage: _selectedIndex != 1,
-            child: screens[1],
-          ),
-          Offstage(
-            offstage: _selectedIndex != 2,
-            child: screens[2],
-          ),
-          Offstage(
-            offstage: _selectedIndex != 3,
-            child: screens[3],
-          ),
-          Offstage(
-            offstage: _selectedIndex != 4,
-            child: screens[4],
-          ),
-        ],
-      ),
+    final currentIndex = _getCurrentIndex(context);
+    
+    return Scaffold(
+      body: child,
       bottomNavigationBar: SizedBox(
         height: 120,
         child: BottomAppBar(
@@ -79,41 +64,39 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               children: [
                 NavTab(
                   text: 'Calendar',
-                  isSelected: _selectedIndex == 0,
+                  isSelected: currentIndex == 0,
                   icon: FontAwesomeIcons.calendar,
-                  onTap: () => _onTap(0),
+                  onTap: () => _onTap(context, 0),
                 ),
                 NavTab(
                   text: 'Diary',
-                  isSelected: _selectedIndex == 1,
+                  isSelected: currentIndex == 1,
                   icon: FontAwesomeIcons.book,
-                  onTap: () => _onTap(1),
+                  onTap: () => _onTap(context, 1),
                 ),
                 NavTab(
                   text: 'Record',
-                  isSelected: _selectedIndex == 2,
+                  isSelected: currentIndex == 2,
                   icon: FontAwesomeIcons.penToSquare,
-                  onTap: () => _onTap(2),
+                  onTap: () => _onTap(context, 2),
                 ),
                 NavTab(
                   text: 'Graphs',
-                  isSelected: _selectedIndex == 3,
+                  isSelected: currentIndex == 3,
                   icon: FontAwesomeIcons.chartLine,
-                  onTap: () => _onTap(3),
+                  onTap: () => _onTap(context, 3),
                 ),
                 NavTab(
                   text: 'Settings',
-                  isSelected: _selectedIndex == 4,
+                  isSelected: currentIndex == 4,
                   icon: FontAwesomeIcons.gear,
-                  onTap: () => _onTap(4),
+                  onTap: () => _onTap(context, 4),
                 ),
               ],
             ),
           ),
         ),
       ),
-    );
-      },
     );
   }
 }

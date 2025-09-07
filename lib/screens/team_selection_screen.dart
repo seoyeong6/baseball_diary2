@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/team.dart';
-import '../main_navigation_screen.dart';
 import '../services/team_selection_helper.dart';
+import '../routing/app_routes.dart';
 
 /// 최초 실행 시 사용자가 좋아하는 KBO 구단을 선택하는 화면
 class TeamSelectionScreen extends StatefulWidget {
@@ -46,11 +47,7 @@ class _TeamSelectionScreenState extends State<TeamSelectionScreen> {
 
         await Future.delayed(const Duration(seconds: 1));
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const MainNavigationScreen(),
-          ),
-        );
+        context.go(AppRoutes.calendar);
       }
     } catch (e) {
       if (mounted) {

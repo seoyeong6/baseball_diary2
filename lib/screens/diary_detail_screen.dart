@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../controllers/calendar_controller.dart';
-import '../main_navigation_screen.dart';
 import '../widgets/cached_image_widget.dart';
+import '../routing/app_routes.dart';
 import 'record_screen.dart';
 
 class DiaryDetailScreen extends StatefulWidget {
@@ -62,11 +63,7 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('기록이 삭제되었습니다')),
         );
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-          (route) => false,
-        );
+        context.go(AppRoutes.diary);
       }
     } catch (e) {
       if (mounted) {
@@ -330,12 +327,8 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
           height: 48,
           child: ElevatedButton.icon(
             onPressed: () {
-              // 메인 화면으로 돌아가기
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-                (route) => false,
-              );
+              // 다이어리 화면으로 돌아가기
+              context.go(AppRoutes.diary);
             },
             icon: const Icon(Icons.check),
             label: const Text('확인'),

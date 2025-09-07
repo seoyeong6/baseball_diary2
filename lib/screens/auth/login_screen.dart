@@ -26,7 +26,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signIn() async {
+    print('Sign in button pressed');
     if (!_formKey.currentState!.validate()) {
+      print('Form validation failed');
       return;
     }
 
@@ -34,10 +36,13 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
+    print('Calling AuthService signIn...');
     final result = await AuthService().signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
+
+    print('Sign in result: success=${result.success}, error=${result.error}');
 
     if (mounted) {
       setState(() {
@@ -51,6 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
             backgroundColor: Colors.red,
           ),
         );
+      } else {
+        print('Login successful, GoRouter should handle redirect');
       }
     }
   }

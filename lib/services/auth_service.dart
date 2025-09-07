@@ -97,24 +97,43 @@ class AuthService extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
+    print('AuthService signIn called with email: $email');
     _isLoading = true;
     notifyListeners();
 
     try {
-      await _auth.signInWithEmailAndPassword(
+      print('Calling Firebase signInWithEmailAndPassword...');
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      print('Firebase signIn successful: ${userCredential.user?.email}');
+      
+      // authStateChanges에서 처리될 때까지 잠깐 기다리기
+      await Future.delayed(const Duration(milliseconds: 100));
+
       // 현재 사용자 정보 업데이트 (authStateChanges에서 자동으로 처리됨)
       _isLoading = false;
       notifyListeners();
-      return AuthResult.success(_currentUser!);
+      
+      if (_currentUser != null) {
+        print('AuthService signIn successful: ${_currentUser!.email}');
+        return AuthResult.success(_currentUser!);
+      } else {
+        print('Warning: _currentUser is null after signIn');
+        // Firebase user를 직접 사용해서 임시 유저 생성
+        final firebaseUser = userCredential.user!;
+        final tempUser = _firebaseUserToAppUser(firebaseUser);
+        return AuthResult.success(tempUser);
+      }
     } on FirebaseAuthException catch (e) {
+      print('Firebase Auth Error: ${e.code} - ${e.message}');
       _isLoading = false;
       notifyListeners();
       return AuthResult.failure(_getAuthErrorMessage(e));
     } catch (e) {
+      print('Unknown Auth Error: $e');
       _isLoading = false;
       notifyListeners();
       return AuthResult.failure('로그인에 실패했습니다: $e');
