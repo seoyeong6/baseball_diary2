@@ -147,22 +147,24 @@ class _RecordScreenState extends State<RecordScreen> {
     try {
       // 하루에 하나의 기록만 허용: 기존 기록이 아닌 경우 해당 날짜에 기록이 있는지 확인
       if (widget.existingEntry == null) {
-        final existingEntries = await _diaryService.getDiaryEntriesByDate(
-          _selectedDate,
-        );
-        if (existingEntries.isNotEmpty) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('이미 해당 날짜에 기록이 있습니다. 하루에 하나의 기록만 작성할 수 있습니다.'),
-                duration: Duration(seconds: 3),
-              ),
-            );
+        try {
+          final existingEntries = await _diaryService.getDiaryEntriesByDate(
+            _selectedDate,
+          );
+          if (existingEntries.isNotEmpty) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('이미 해당 날짜에 기록이 있습니다. 하루에 하나의 기록만 작성할 수 있습니다.'),
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            }
+            return;
           }
-          setState(() {
-            _isLoading = false;
-          });
-          return;
+        } catch (e) {
+          // 중복 확인 중 에러가 발생해도 저장은 계속 진행
+          debugPrint('Duplicate check failed, but continuing with save: $e');
         }
       }
 
@@ -187,9 +189,6 @@ class _RecordScreenState extends State<RecordScreen> {
               ),
             );
           }
-          setState(() {
-            _isLoading = false;
-          });
           return;
         }
       }
@@ -208,20 +207,18 @@ class _RecordScreenState extends State<RecordScreen> {
         imagePath: firebaseImageUrl ?? widget.existingEntry?.imagePath,
       );
 
+      // CalendarController를 통해 저장 및 캐시 업데이트
+      final calendarController = Provider.of<CalendarController>(
+        context,
+        listen: false,
+      );
+      if (widget.existingEntry != null) {
+        await calendarController.updateDiaryEntry(entry);
+      } else {
+        await calendarController.addNewDiaryEntry(entry);
+      }
 
       if (mounted) {
-        // CalendarController를 통해 저장 및 캐시 업데이트
-        final calendarController = Provider.of<CalendarController>(
-          context,
-          listen: false,
-        );
-        if (widget.existingEntry != null) {
-          await calendarController.updateDiaryEntry(entry);
-        } else {
-          await calendarController.addNewDiaryEntry(entry);
-        }
-
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -240,6 +237,7 @@ class _RecordScreenState extends State<RecordScreen> {
         );
       }
     } catch (e) {
+      debugPrint('Save entry error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
