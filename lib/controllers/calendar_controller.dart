@@ -229,4 +229,21 @@ class CalendarController extends ChangeNotifier {
     await _loadCalendarData();
     await _loadEventsForSelectedDay();
   }
+
+  /// 팀 변경 시 호출되는 메서드
+  Future<void> onTeamChanged() async {
+    try {
+      // 새로운 팀 ID 로드
+      _selectedTeamId = await TeamSelectionHelper.getSelectedTeamId();
+      
+      // 캘린더 데이터 새로고침
+      await _loadCalendarData();
+      await _loadEventsForSelectedDay();
+      
+      notifyListeners();
+    } catch (e) {
+      // 에러 발생 시에도 UI 업데이트
+      notifyListeners();
+    }
+  }
 }

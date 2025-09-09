@@ -154,7 +154,7 @@ class CalendarScreen extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
             ),
           ),
-          if (entries.isNotEmpty && entries.first.content.isNotEmpty)
+          if (entries.isNotEmpty)
             Positioned(
               top: 2,
               right: 2,
@@ -199,7 +199,7 @@ class CalendarScreen extends StatelessWidget {
               ),
             ),
           ),
-          if (entries.isNotEmpty && entries.first.content.isNotEmpty)
+          if (entries.isNotEmpty)
             Positioned(
               top: 2,
               right: 2,
@@ -244,7 +244,7 @@ class CalendarScreen extends StatelessWidget {
               ),
             ),
           ),
-          if (entries.isNotEmpty && entries.first.content.isNotEmpty)
+          if (entries.isNotEmpty)
             Positioned(
               top: 2,
               right: 2,

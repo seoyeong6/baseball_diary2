@@ -8,6 +8,7 @@ import '../services/team_selection_helper.dart';
 import '../services/diary_service.dart';
 import '../models/team.dart';
 import '../controllers/theme_controller.dart';
+import '../controllers/calendar_controller.dart';
 import '../widgets/team_info_widget.dart';
 import '../services/auth_service.dart';
 import 'team_selection_screen.dart';
@@ -53,6 +54,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             setState(() {
               _selectedTeam = team;
             });
+            
+            // 캘린더 컨트롤러에 팀 변경 알림
+            if (context.mounted) {
+              final calendarController = context.read<CalendarController>();
+              await calendarController.onTeamChanged();
+            }
           },
         ),
       ),
