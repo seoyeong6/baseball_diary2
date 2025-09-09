@@ -47,7 +47,15 @@ class _TeamSelectionScreenState extends State<TeamSelectionScreen> {
 
         await Future.delayed(const Duration(seconds: 1));
 
-        context.go(AppRoutes.calendar);
+        if (mounted) {
+          // Navigator.push로 들어온 경우 pop으로 돌아가기
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          } else {
+            // GoRouter로 직접 접근한 경우 캘린더로 이동
+            context.go(AppRoutes.calendar);
+          }
+        }
       }
     } catch (e) {
       if (mounted) {

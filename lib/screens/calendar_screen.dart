@@ -6,93 +6,14 @@ import '../controllers/calendar_controller.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../models/sticker_data.dart';
-import '../services/team_selection_helper.dart';
-import '../widgets/sticker_selection_modal.dart';
 import '../widgets/team_info_widget.dart';
 import 'diary_detail_screen.dart';
-import 'record_screen.dart';
+import 'team_selection_screen.dart';
 
 /// 월간 캘린더 뷰와 일별 기록 표시, 스티커 기능이 포함된 캘린더 화면
 class CalendarScreen extends StatelessWidget {
   const CalendarScreen({super.key});
 
-  void _showStickerSelectionModal(BuildContext context, CalendarController controller) {
-    final dateToUse = controller.selectedDay ?? DateTime.now();
-    final entries = controller.getCachedEventsForDay(dateToUse);
-
-    // 기존 기록이 있으면 스티커 추가를 차단
-    if (entries.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('이미 기록이 있는 날짜에는 스티커를 추가할 수 없습니다'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StickerSelectionModal(
-        selectedDate: dateToUse,
-        onStickersSelected: (stickerTypes) => _onStickersSelected(context, controller, stickerTypes, dateToUse),
-      ),
-    );
-  }
-
-  Future<void> _onStickersSelected(BuildContext context, CalendarController controller, List<StickerType> stickerTypes, DateTime selectedDate) async {
-    try {
-      final entries = controller.getCachedEventsForDay(selectedDate);
-      DiaryEntry entryToUpdate;
-      
-      if (entries.isEmpty) {
-        // 선택된 팀 ID 가져오기 (없으면 기본값 1 사용)
-        final selectedTeamId = await TeamSelectionHelper.getSelectedTeamId() ?? 1;
-        
-        // 기록이 없으면 새 기록 생성
-        entryToUpdate = DiaryEntry(
-          id: '${DateTime.now().millisecondsSinceEpoch}',
-          title: '${selectedDate.year}/${selectedDate.month}/${selectedDate.day}',
-          content: '',
-          emotion: Emotion.neutral,
-          date: selectedDate,
-          teamId: selectedTeamId,
-          stickers: stickerTypes,
-        );
-        await controller.addNewDiaryEntry(entryToUpdate);
-      } else {
-        // 기존 기록에 스티커 추가
-        final existingEntry = entries.first;
-        final updatedStickers = [...existingEntry.stickers, ...stickerTypes];
-        entryToUpdate = existingEntry.copyWith(stickers: updatedStickers);
-        await controller.updateDiaryEntry(entryToUpdate);
-      }
-      
-      if (context.mounted) {
-        final message = entries.isEmpty 
-          ? '스티커와 함께 새 기록이 생성되었습니다'
-          : '스티커가 추가되었습니다';
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('스티커 추가에 실패했습니다'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    }
-  }
 
   Widget _buildEmotionIcon(Emotion emotion, {required double size, required Color color}) {
     final iconData = emotion.fallbackIcon;
@@ -473,36 +394,20 @@ class CalendarScreen extends StatelessWidget {
               ],
             ),
             
-            // 새 일기 추가 및 스티커 추가 플로팅 버튼
-            floatingActionButton: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FloatingActionButton(
-                  heroTag: "sticker_fab",
-                  onPressed: () => _showStickerSelectionModal(context, controller),
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  child: const Icon(Icons.emoji_emotions),
-                ),
-                const SizedBox(height: 16),
-                FloatingActionButton(
-                  heroTag: "diary_fab",
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RecordScreen(
-                          selectedDate: controller.selectedDay ?? DateTime.now(),
-                        ),
-                      ),
-                    );
-                    
-                    if (result == true) {
-                      controller.refreshCalendar();
-                    }
-                  },
-                  child: const Icon(Icons.add),
-                ),
-              ],
+            // 팀 선택 플로팅 버튼
+            floatingActionButton: FloatingActionButton(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TeamSelectionScreen(),
+                  ),
+                );
+                
+                // 팀 변경 후 캘린더 새로고침
+                controller.onTeamChanged();
+              },
+              child: const Icon(Icons.sports_baseball),
             ),
           );
         },
