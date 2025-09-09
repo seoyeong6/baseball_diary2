@@ -462,15 +462,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         getTitlesWidget: (value, meta) {
                           switch (value.toInt()) {
                             case 1:
-                              return Text('매우\n나쁨', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
+                              return Text('화남', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
                             case 2:
-                              return Text('나쁨', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
+                              return Text('슬픔', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
                             case 3:
                               return Text('보통', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
                             case 4:
-                              return Text('좋음', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
+                              return Text('기쁨', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
                             case 5:
-                              return Text('매우\n좋음', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
+                              return Text('흥분', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10), textAlign: TextAlign.center);
                             default:
                               return const SizedBox.shrink();
                           }

@@ -678,7 +678,7 @@
               "9.4"
             ],
             "details": "AuthService와 연동하여 로그인 상태에 따른 데이터 저장 방식 분기",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 6,
@@ -688,7 +688,7 @@
               "9.5"
             ],
             "details": "connectivity_plus 패키지로 네트워크 상태 확인. 오프라인 시 로컬 저장만 사용",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 7,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-09-06T05:33:56.998Z",
+      "updated": "2025-09-09T09:05:58.530Z",
       "description": "Tasks for master context"
     }
   }

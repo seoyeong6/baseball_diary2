@@ -4,6 +4,7 @@ import '../models/sticker_data.dart';
 import 'auth_service.dart';
 import 'local_storage_service.dart';
 import 'firebase_service.dart';
+import 'connectivity_service.dart';
 
 /// 야구 다이어리 데이터를 관리하는 통합 서비스
 /// 로그인 상태에 따라 로컬 저장소 또는 Firebase를 사용
@@ -15,6 +16,7 @@ class DiaryService extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final LocalStorageService _localStorageService = LocalStorageService();
   final FirebaseService _firebaseService = FirebaseServiceStub();
+  final ConnectivityService _connectivityService = ConnectivityService();
 
   bool _isInitialized = false;
   bool _isLoading = false;
@@ -26,6 +28,8 @@ class DiaryService extends ChangeNotifier {
   String? get lastError => _lastError;
   bool get isUsingCloudStorage => _authService.isAuthenticated;
   bool get dataCleared => _dataCleared;
+  bool get isOnline => _connectivityService.isOnline;
+  bool get isOffline => _connectivityService.isOffline;
 
   /// 서비스 초기화
   Future<void> initialize() async {
@@ -36,6 +40,9 @@ class DiaryService extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // ConnectivityService 초기화
+      await _connectivityService.initialize();
+      
       // AuthService 초기화 확인
       if (!_authService.isAuthenticated && _authService.currentUser == null) {
         await _authService.initialize();
@@ -58,9 +65,16 @@ class DiaryService extends ChangeNotifier {
   /// 클라우드 동기화 시도
   Future<void> _attemptCloudSync() async {
     try {
+      // 네트워크 연결이 없으면 동기화 건너뛰기
+      if (_connectivityService.isOffline) {
+        debugPrint('DiaryService: Network offline, skipping cloud sync');
+        return;
+      }
+
       // Firebase 연결 상태 확인
       final isConnected = await _firebaseService.isConnected();
       if (!isConnected) {
+        debugPrint('DiaryService: Firebase not connected, skipping cloud sync');
         return;
       }
 
@@ -70,8 +84,24 @@ class DiaryService extends ChangeNotifier {
 
       // Firebase와 동기화
       await _firebaseService.syncWithLocal(localDiaryEntries, localStickerData);
+      debugPrint('DiaryService: Cloud sync completed successfully');
     } catch (e) {
       // 동기화 실패는 치명적 오류가 아니므로 계속 진행
+      debugPrint('DiaryService: Cloud sync failed: $e');
+    }
+  }
+
+  /// 클라우드 저장소 사용 가능 여부 확인
+  /// 로그인되어 있고 온라인 상태일 때만 true 반환
+  Future<bool> _isCloudStorageAvailable() async {
+    if (!isUsingCloudStorage) return false;
+    if (_connectivityService.isOffline) return false;
+    
+    try {
+      return await _firebaseService.isConnected();
+    } catch (e) {
+      debugPrint('DiaryService: Error checking cloud storage availability: $e');
+      return false;
     }
   }
 
@@ -82,12 +112,13 @@ class DiaryService extends ChangeNotifier {
     await _ensureInitialized();
     
     try {
-      if (isUsingCloudStorage) {
-        final isConnected = await _firebaseService.isConnected();
-        if (isConnected) {
-          return await _firebaseService.getAllDiaryEntries();
-        }
+      final useCloud = await _isCloudStorageAvailable();
+      if (useCloud) {
+        debugPrint('DiaryService: Loading diary entries from cloud storage');
+        return await _firebaseService.getAllDiaryEntries();
       }
+      
+      debugPrint('DiaryService: Loading diary entries from local storage');
       return await _localStorageService.getAllDiaryEntries();
     } catch (e) {
       _lastError = '일기 항목을 불러오는데 실패했습니다: $e';
@@ -101,11 +132,9 @@ class DiaryService extends ChangeNotifier {
     await _ensureInitialized();
     
     try {
-      if (isUsingCloudStorage) {
-        final isConnected = await _firebaseService.isConnected();
-        if (isConnected) {
-          return await _firebaseService.getDiaryEntryById(id);
-        }
+      final useCloud = await _isCloudStorageAvailable();
+      if (useCloud) {
+        return await _firebaseService.getDiaryEntryById(id);
       }
       return await _localStorageService.getDiaryEntryById(id);
     } catch (e) {
@@ -120,11 +149,9 @@ class DiaryService extends ChangeNotifier {
     await _ensureInitialized();
     
     try {
-      if (isUsingCloudStorage) {
-        final isConnected = await _firebaseService.isConnected();
-        if (isConnected) {
-          return await _firebaseService.getDiaryEntriesByDate(date);
-        }
+      final useCloud = await _isCloudStorageAvailable();
+      if (useCloud) {
+        return await _firebaseService.getDiaryEntriesByDate(date);
       }
       return await _localStorageService.getDiaryEntriesByDate(date);
     } catch (e) {
@@ -144,13 +171,15 @@ class DiaryService extends ChangeNotifier {
     try {
       // 로컬에 먼저 저장 (오프라인 지원)
       await _localStorageService.saveDiaryEntry(entry);
+      debugPrint('DiaryService: Entry saved to local storage');
 
-      // 클라우드 저장소 사용 시 동기화 시도
-      if (isUsingCloudStorage) {
-        final isConnected = await _firebaseService.isConnected();
-        if (isConnected) {
-          await _firebaseService.saveDiaryEntry(entry);
-        }
+      // 클라우드 저장소 사용 가능하면 동기화 시도
+      final useCloud = await _isCloudStorageAvailable();
+      if (useCloud) {
+        await _firebaseService.saveDiaryEntry(entry);
+        debugPrint('DiaryService: Entry synced to cloud storage');
+      } else if (isUsingCloudStorage) {
+        debugPrint('DiaryService: Cloud storage unavailable, entry saved locally only');
       }
     } catch (e) {
       _lastError = '일기 항목을 저장하는데 실패했습니다: $e';

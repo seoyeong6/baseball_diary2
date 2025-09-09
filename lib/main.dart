@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:baseball_diary2/widgets/themes.dart';
 import 'package:baseball_diary2/services/auth_service.dart';
+import 'package:baseball_diary2/services/connectivity_service.dart';
 import 'package:baseball_diary2/controllers/calendar_controller.dart';
 import 'package:baseball_diary2/controllers/theme_controller.dart';
 import 'package:baseball_diary2/routing/router_config.dart';
@@ -14,6 +15,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await AuthService().initialize();
+  await ConnectivityService().initialize();
   runApp(const BaseballDiaryApp());
 }
 
@@ -30,6 +32,7 @@ class _BaseballDiaryAppState extends State<BaseballDiaryApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthService()),
+        ChangeNotifierProvider(create: (context) => ConnectivityService()),
         ChangeNotifierProvider(create: (context) => CalendarController()),
         ChangeNotifierProvider(create: (context) => ThemeController()),
       ],

@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__task-master-ai__parse_prd",
+      "Bash(npx:*)",
+      "mcp__task-master-ai__get_tasks",
+      "Bash(cc usage blocks:*)",
+      "mcp__task-master-ai__analyze_project_complexity",
+      "mcp__task-master-ai__expand_all",
+      "mcp__task-master-ai__expand_task",
+      "Bash(flutter pub:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter run:*)",
+      "Bash(flutter:*)",
+      "Bash(q)",
+      "Bash(task-master generate:*)",
+      "Bash(task-master list:*)",
+      "Bash(task-master show:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "task-master-ai"
+  ]
+}
