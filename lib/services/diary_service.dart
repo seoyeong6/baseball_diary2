@@ -4,6 +4,8 @@ import '../models/sticker_data.dart';
 import 'auth_service.dart';
 import 'local_storage_service.dart';
 import 'firebase_service.dart';
+import 'firestore_service.dart';
+import 'sync_service.dart';
 
 /// 야구 다이어리 데이터를 관리하는 통합 서비스
 /// 로그인 상태에 따라 로컬 저장소 또는 Firebase를 사용
@@ -14,7 +16,8 @@ class DiaryService extends ChangeNotifier {
 
   final AuthService _authService = AuthService();
   final LocalStorageService _localStorageService = LocalStorageService();
-  final FirebaseService _firebaseService = FirebaseServiceStub();
+  final FirebaseService _firebaseService = FirestoreService();
+  final SyncService _syncService = SyncService();
 
   bool _isInitialized = false;
   bool _isLoading = false;
@@ -26,6 +29,7 @@ class DiaryService extends ChangeNotifier {
   String? get lastError => _lastError;
   bool get isUsingCloudStorage => _authService.isAuthenticated;
   bool get dataCleared => _dataCleared;
+  SyncService get syncService => _syncService;
 
   /// 서비스 초기화
   Future<void> initialize() async {
@@ -64,14 +68,18 @@ class DiaryService extends ChangeNotifier {
         return;
       }
 
-      // 로컬 데이터 가져오기
-      final localDiaryEntries = await _localStorageService.getAllDiaryEntries();
-      final localStickerData = await _localStorageService.getAllStickerData();
+      // SyncService를 통한 스마트 동기화 수행
+      await _syncService.syncAll();
 
-      // Firebase와 동기화
-      await _firebaseService.syncWithLocal(localDiaryEntries, localStickerData);
+      // 충돌이 있는 경우 처리
+      if (_syncService.hasConflicts) {
+        // 기본 전략으로 자동 해결
+        // UI에서 사용자가 수동으로 해결하도록 할 수도 있음
+        debugPrint('Sync conflicts detected: ${_syncService.conflicts.length} conflicts');
+      }
     } catch (e) {
       // 동기화 실패는 치명적 오류가 아니므로 계속 진행
+      debugPrint('Sync attempt failed: $e');
     }
   }
 
@@ -387,6 +395,13 @@ class DiaryService extends ChangeNotifier {
 
     try {
       await _attemptCloudSync();
+
+      // 동기화 상태 확인
+      if (_syncService.syncStatus == SyncStatus.conflict) {
+        _lastError = '동기화 충돌이 발생했습니다. ${_syncService.conflicts.length}개의 충돌을 해결해야 합니다.';
+      } else if (_syncService.syncStatus == SyncStatus.failed) {
+        _lastError = _syncService.lastError ?? '클라우드 동기화에 실패했습니다.';
+      }
     } catch (e) {
       _lastError = '클라우드 동기화에 실패했습니다: $e';
       notifyListeners();

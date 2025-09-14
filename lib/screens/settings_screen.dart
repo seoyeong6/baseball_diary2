@@ -11,6 +11,7 @@ import '../controllers/theme_controller.dart';
 import '../controllers/calendar_controller.dart';
 import '../widgets/team_info_widget.dart';
 import '../services/auth_service.dart';
+import '../widgets/sync_status_widget.dart';
 import 'team_selection_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -285,6 +286,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
             onTap: _changeTeam,
+          ),
+
+          _buildDivider(context),
+
+          // 동기화 상태 섹션
+          _buildSectionHeader(context, '데이터 동기화'),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: SyncStatusWidget(),
           ),
 
           _buildDivider(context),

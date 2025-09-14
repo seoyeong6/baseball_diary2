@@ -630,7 +630,7 @@
         "dependencies": [
           1
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -688,7 +688,7 @@
               "9.5"
             ],
             "details": "connectivity_plus 패키지로 네트워크 상태 확인. 오프라인 시 로컬 저장만 사용",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 7,
@@ -698,7 +698,7 @@
               "9.6"
             ],
             "details": "로컬과 클라우드 데이터 동기화. 충돌 시 해결 로직 및 사용자 선택 옵션",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 8,
@@ -979,7 +979,7 @@
     ],
     "metadata": {
       "created": "2025-08-28T19:45:41.346Z",
-      "updated": "2025-09-14T01:48:00.781Z",
+      "updated": "2025-09-14T11:38:24.224Z",
       "description": "Tasks for master context"
     }
   }

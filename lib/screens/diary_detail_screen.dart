@@ -11,10 +11,12 @@ import 'record_screen.dart';
 
 class DiaryDetailScreen extends StatefulWidget {
   final DiaryEntry entry;
+  final String? sourceTab; // 'calendar' or 'diary'
 
   const DiaryDetailScreen({
     super.key,
     required this.entry,
+    this.sourceTab,
   });
 
   @override
@@ -64,7 +66,12 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('기록이 삭제되었습니다')),
         );
-        context.go(AppRoutes.diary);
+        // 삭제 후에도 소스 탭으로 돌아가기
+        if (widget.sourceTab == 'calendar') {
+          context.go(AppRoutes.calendar);
+        } else {
+          context.go(AppRoutes.diary);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -341,8 +348,12 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
           height: 48,
           child: ElevatedButton.icon(
             onPressed: () {
-              // 다이어리 화면으로 돌아가기
-              context.go(AppRoutes.diary);
+              // 소스 탭에 따라 적절한 화면으로 돌아가기
+              if (widget.sourceTab == 'calendar') {
+                context.go(AppRoutes.calendar);
+              } else {
+                context.go(AppRoutes.diary);
+              }
             },
             icon: const Icon(Icons.check),
             label: const Text('확인'),

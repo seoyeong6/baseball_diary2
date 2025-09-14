@@ -235,4 +235,29 @@ class LocalStorageService {
       };
     }
   }
+
+  /// 일반적인 데이터 저장 메서드
+  Future<void> saveData(String key, Map<String, dynamic> data) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = json.encode(data);
+      await prefs.setString(key, jsonString);
+    } catch (e) {
+      throw Exception('데이터 저장 실패: $e');
+    }
+  }
+
+  /// 일반적인 데이터 가져오기 메서드
+  Future<Map<String, dynamic>?> getData(String key) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = prefs.getString(key);
+      if (jsonString != null) {
+        return json.decode(jsonString) as Map<String, dynamic>;
+      }
+      return null;
+    } catch (e) {
+      throw Exception('데이터 로드 실패: $e');
+    }
+  }
 }

@@ -316,7 +316,10 @@ class CalendarScreen extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DiaryDetailScreen(entry: entry),
+                                    builder: (context) => DiaryDetailScreen(
+                                      entry: entry,
+                                      sourceTab: 'calendar',
+                                    ),
                                   ),
                                 );
                               },

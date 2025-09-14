@@ -9,6 +9,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'auth_service.dart';
 
 class ImageService {
   static final ImageService _instance = ImageService._internal();
@@ -17,6 +18,7 @@ class ImageService {
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final Connectivity _connectivity = Connectivity();
+  final AuthService _authService = AuthService();
 
   // Upload queue management
   static const String _uploadQueueKey = 'image_upload_queue';
@@ -150,9 +152,10 @@ class ImageService {
         return null;
       }
 
-      // Firebase Storage에 업로드
+      // Firebase Storage에 업로드 - 사용자별 폴더 구조
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final ref = _storage.ref().child('images/$fileName');
+      final userId = _authService.currentUser?.id ?? 'anonymous';
+      final ref = _storage.ref().child('users/$userId/images/$fileName');
 
       final uploadTask = ref.putData(
         compressedData,
@@ -177,6 +180,35 @@ class ImageService {
       await ref.delete();
       return true;
     } catch (e) {
+      return false;
+    }
+  }
+
+  /// Delete all user images from Firebase Storage (for account deletion)
+  Future<bool> deleteAllUserImages() async {
+    try {
+      final userId = _authService.currentUser?.id;
+      if (userId == null) return false;
+
+      // Get reference to user's images folder
+      final userImagesRef = _storage.ref().child('users/$userId/images');
+
+      // List all files in the user's images folder
+      final listResult = await userImagesRef.listAll();
+
+      // Delete all files
+      final deleteOperations = listResult.items.map((ref) => ref.delete());
+      await Future.wait(deleteOperations);
+
+      if (kDebugMode) {
+        print('Deleted ${listResult.items.length} images for user $userId');
+      }
+
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting user images: $e');
+      }
       return false;
     }
   }
