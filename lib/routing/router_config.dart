@@ -35,10 +35,10 @@ final GoRouter appRouter = GoRouter(
         return null;
       }
       
-      // 인증되지 않은 경우 로그인 페이지로
-      if (!authService.isAuthenticated) {
+      // 인증되지 않은 경우 (오프라인 상태 고려)
+      if (!authService.isAuthenticatedOrOffline) {
         if (location != AppRoutes.auth) {
-          print('Not authenticated, redirecting to auth');
+          print('Not authenticated (including offline check), redirecting to auth');
           return AppRoutes.auth;
         }
         print('Already at auth page');
@@ -46,9 +46,9 @@ final GoRouter appRouter = GoRouter(
       }
       
       // 인증된 상태에서 auth 페이지에 있으면 팀 선택 확인
-      if (authService.isAuthenticated) {
+      if (authService.isAuthenticatedOrOffline) {
         if (location == AppRoutes.auth) {
-          print('Authenticated but at auth page, checking team selection');
+          print('Authenticated (or offline) but at auth page, checking team selection');
           final hasSelectedTeam = await TeamSelectionHelper.hasSelectedTeam();
           if (!hasSelectedTeam) {
             print('No team selected, redirecting to team selection');
@@ -57,8 +57,8 @@ final GoRouter appRouter = GoRouter(
           print('Team selected, redirecting to calendar');
           return AppRoutes.calendar;
         }
-        
-        // 다른 페이지에서도 팀 선택 상태 확인
+
+        // 다른 페이지에서도 팀 선택 상태 확인 (오프라인에서도 로컬 저장된 팀 정보 확인)
         if (location != AppRoutes.teamSelection) {
           final hasSelectedTeam = await TeamSelectionHelper.hasSelectedTeam();
           if (!hasSelectedTeam) {

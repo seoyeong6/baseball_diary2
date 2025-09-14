@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../models/user.dart' as app_user;
 
 class AuthService extends ChangeNotifier {
@@ -8,21 +9,32 @@ class AuthService extends ChangeNotifier {
   AuthService._internal();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final Connectivity _connectivity = Connectivity();
   app_user.User? _currentUser;
   bool _isLoading = false;
+  bool _isOffline = false;
 
   app_user.User? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
+  bool get isOffline => _isOffline;
+
+  bool get isAuthenticatedOrOffline =>
+      isAuthenticated || (isOffline && hasValidLocalSession);
+
+  bool get hasValidLocalSession => _auth.currentUser != null;
 
   Future<void> initialize() async {
     _isLoading = true;
     notifyListeners();
 
     try {
+      // 네트워크 연결 상태 초기화
+      await _initializeConnectivity();
+
       // Firebase Auth 상태 변경 감지
       _auth.authStateChanges().listen(_onAuthStateChanged);
-      
+
       // 현재 로그인된 사용자 확인
       final firebaseUser = _auth.currentUser;
       if (firebaseUser != null) {
@@ -30,10 +42,40 @@ class AuthService extends ChangeNotifier {
       }
     } catch (e) {
       // Firebase 초기화 오류 처리
+      if (kDebugMode) {
+        print('AuthService initialization error: $e');
+      }
     }
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> _initializeConnectivity() async {
+    try {
+      // 초기 연결 상태 확인
+      final connectivityResult = await _connectivity.checkConnectivity();
+      _isOffline = connectivityResult.contains(ConnectivityResult.none);
+
+      // 네트워크 상태 변경 감지
+      _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> results) {
+        final wasOffline = _isOffline;
+        _isOffline = results.contains(ConnectivityResult.none);
+
+        if (wasOffline != _isOffline) {
+          if (kDebugMode) {
+            print('Network status changed: ${_isOffline ? 'offline' : 'online'}');
+          }
+          notifyListeners();
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Connectivity initialization error: $e');
+      }
+      // 연결 상태 확인 실패 시 온라인으로 가정
+      _isOffline = false;
+    }
   }
 
   void _onAuthStateChanged(User? firebaseUser) {
@@ -59,6 +101,11 @@ class AuthService extends ChangeNotifier {
     required String password,
     required String name,
   }) async {
+    // 오프라인 상태에서는 회원가입 불가
+    if (_isOffline) {
+      return AuthResult.failure('인터넷 연결이 필요합니다. 네트워크 상태를 확인해주세요.');
+    }
+
     _isLoading = true;
     notifyListeners();
 
@@ -97,43 +144,62 @@ class AuthService extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    print('AuthService signIn called with email: $email');
+    if (kDebugMode) {
+      print('AuthService signIn called with email: $email');
+    }
+
+    // 오프라인 상태에서는 로그인 불가
+    if (_isOffline) {
+      return AuthResult.failure('인터넷 연결이 필요합니다. 네트워크 상태를 확인해주세요.');
+    }
+
     _isLoading = true;
     notifyListeners();
 
     try {
-      print('Calling Firebase signInWithEmailAndPassword...');
+      if (kDebugMode) {
+        print('Calling Firebase signInWithEmailAndPassword...');
+      }
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      print('Firebase signIn successful: ${userCredential.user?.email}');
-      
+      if (kDebugMode) {
+        print('Firebase signIn successful: ${userCredential.user?.email}');
+      }
+
       // authStateChanges에서 처리될 때까지 잠깐 기다리기
       await Future.delayed(const Duration(milliseconds: 100));
 
-      // 현재 사용자 정보 업데이트 (authStateChanges에서 자동으로 처리됨)
       _isLoading = false;
       notifyListeners();
-      
+
       if (_currentUser != null) {
-        print('AuthService signIn successful: ${_currentUser!.email}');
+        if (kDebugMode) {
+          print('AuthService signIn successful: ${_currentUser!.email}');
+        }
         return AuthResult.success(_currentUser!);
       } else {
-        print('Warning: _currentUser is null after signIn');
+        if (kDebugMode) {
+          print('Warning: _currentUser is null after signIn');
+        }
         // Firebase user를 직접 사용해서 임시 유저 생성
         final firebaseUser = userCredential.user!;
         final tempUser = _firebaseUserToAppUser(firebaseUser);
         return AuthResult.success(tempUser);
       }
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error: ${e.code} - ${e.message}');
+      if (kDebugMode) {
+        print('Firebase Auth Error: ${e.code} - ${e.message}');
+      }
       _isLoading = false;
       notifyListeners();
       return AuthResult.failure(_getAuthErrorMessage(e));
     } catch (e) {
-      print('Unknown Auth Error: $e');
+      if (kDebugMode) {
+        print('Unknown Auth Error: $e');
+      }
       _isLoading = false;
       notifyListeners();
       return AuthResult.failure('로그인에 실패했습니다: $e');

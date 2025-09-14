@@ -50,7 +50,7 @@ class MainNavigationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentIndex = _getCurrentIndex(context);
-    
+
     return Scaffold(
       body: child,
       bottomNavigationBar: SizedBox(
