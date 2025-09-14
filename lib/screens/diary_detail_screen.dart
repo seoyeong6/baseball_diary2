@@ -5,6 +5,7 @@ import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../controllers/calendar_controller.dart';
 import '../widgets/cached_image_widget.dart';
+import '../widgets/image_upload_indicator.dart';
 import '../routing/app_routes.dart';
 import 'record_screen.dart';
 
@@ -278,7 +279,7 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
             ],
             
             // 사진 섹션
-            if (_currentEntry.imagePath != null) ...[
+            if (_currentEntry.hasImage) ...[
               Divider(color: theme.dividerColor),
               
               Padding(
@@ -293,9 +294,22 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    // Show upload status if pending
+                    if (_currentEntry.imageUploadPending == true) ...[
+                      ImageUploadIndicator(
+                        entry: _currentEntry,
+                        onUploadComplete: () {
+                          // Refresh the entry when upload completes
+                          setState(() {
+                            // You might want to reload the entry from the database here
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                     Center(
                       child: GestureDetector(
-                        onTap: () => _showImageZoom(_currentEntry.imagePath!),
+                        onTap: () => _showImageZoom(_currentEntry.displayImagePath!),
                         child: Hero(
                           tag: 'image_${_currentEntry.id}',
                           child: CachedImageWidget(

@@ -4,6 +4,7 @@ import '../services/team_selection_helper.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../widgets/team_info_widget.dart';
+import '../widgets/image_upload_indicator.dart';
 import 'diary_detail_screen.dart';
 
 enum SortOption {
@@ -469,7 +470,7 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                               ],
                               
                               // 이미지가 있는 경우 표시
-                              if (entry.imagePath != null) ...[
+                              if (entry.hasImage) ...[
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
@@ -484,6 +485,12 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                                       style: theme.textTheme.bodySmall?.copyWith(
                                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                                       ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // 업로드 상태 아이콘
+                                    ImageUploadStatusIcon(
+                                      uploadPending: entry.imageUploadPending,
+                                      size: 16,
                                     ),
                                   ],
                                 ),

@@ -11,9 +11,6 @@ Users can select their favorite KBO team, write diary entries with text,
 emotion, and one photo, and visualize their records in a calendar and
 charts.
 
-The app follows **Material Design 3** with a black color scheme seed and
-supports both light and dark themes with system theme detection.
-
 ------------------------------------------------------------------------
 
 ## Common Development Commands

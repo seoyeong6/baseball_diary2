@@ -169,27 +169,46 @@ class _RecordScreenState extends State<RecordScreen> {
       }
 
       final now = DateTime.now();
+      final entryId = widget.existingEntry?.id ?? '${now.millisecondsSinceEpoch}';
 
-      // 이미지가 있으면 Firebase Storage에 업로드
+      // Offline-first image upload
       String? firebaseImageUrl;
+      String? localImagePath;
+      bool imageUploadPending = false;
+
       if (_selectedImage != null) {
-        firebaseImageUrl = await _imageService.uploadImageToFirebase(
+        final uploadResult = await _imageService.uploadImageOfflineFirst(
           _selectedImage!.path,
+          entryId: entryId,
           quality: 85,
           maxWidth: 1080,
           maxHeight: 1080,
         );
 
-        if (firebaseImageUrl == null) {
+        if (!uploadResult.success) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('이미지 업로드에 실패했습니다'),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(uploadResult.error ?? '이미지 처리에 실패했습니다'),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
           return;
+        }
+
+        firebaseImageUrl = uploadResult.remoteUrl;
+        localImagePath = uploadResult.localPath;
+        imageUploadPending = uploadResult.uploadPending;
+
+        // Show appropriate message based on upload status
+        if (mounted && imageUploadPending) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('오프라인 상태입니다. 이미지는 온라인 상태가 되면 자동으로 업로드됩니다.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
         }
       }
 
@@ -197,7 +216,7 @@ class _RecordScreenState extends State<RecordScreen> {
       final selectedTeamId = await TeamSelectionHelper.getSelectedTeamId() ?? 1;
 
       final entry = DiaryEntry(
-        id: widget.existingEntry?.id ?? '${now.millisecondsSinceEpoch}',
+        id: entryId,
         title: _titleController.text.trim(),
         content: _contentController.text.trim(),
         emotion: _selectedEmotion,
@@ -205,6 +224,8 @@ class _RecordScreenState extends State<RecordScreen> {
         teamId: selectedTeamId,
         stickers: _selectedStickers,
         imagePath: firebaseImageUrl ?? widget.existingEntry?.imagePath,
+        localImagePath: localImagePath ?? widget.existingEntry?.localImagePath,
+        imageUploadPending: imageUploadPending || widget.existingEntry?.imageUploadPending == true,
       );
 
       // CalendarController를 통해 저장 및 캐시 업데이트
