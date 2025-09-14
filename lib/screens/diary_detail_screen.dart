@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../controllers/calendar_controller.dart';
 import '../widgets/cached_image_widget.dart';
 import '../widgets/image_upload_indicator.dart';
-import '../routing/app_routes.dart';
 import 'record_screen.dart';
 
 class DiaryDetailScreen extends StatefulWidget {
@@ -66,12 +64,8 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('기록이 삭제되었습니다')),
         );
-        // 삭제 후에도 소스 탭으로 돌아가기
-        if (widget.sourceTab == 'calendar') {
-          context.go(AppRoutes.calendar);
-        } else {
-          context.go(AppRoutes.diary);
-        }
+        // 삭제 후 소스 탭으로 돌아가기
+        Navigator.pop(context, widget.sourceTab);
       }
     } catch (e) {
       if (mounted) {
@@ -348,12 +342,8 @@ class _DiaryDetailScreenState extends State<DiaryDetailScreen> {
           height: 48,
           child: ElevatedButton.icon(
             onPressed: () {
-              // 소스 탭에 따라 적절한 화면으로 돌아가기
-              if (widget.sourceTab == 'calendar') {
-                context.go(AppRoutes.calendar);
-              } else {
-                context.go(AppRoutes.diary);
-              }
+              // 상세화면을 닫으면서 소스 탭 정보 전달
+              Navigator.pop(context, widget.sourceTab);
             },
             icon: const Icon(Icons.check),
             label: const Text('확인'),

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../controllers/calendar_controller.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../models/sticker_data.dart';
 import '../widgets/team_info_widget.dart';
+import '../routing/app_routes.dart';
 import 'diary_detail_screen.dart';
 import 'team_selection_screen.dart';
 
@@ -312,8 +314,8 @@ class CalendarScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: ListTile(
-                              onTap: () {
-                                Navigator.push(
+                              onTap: () async {
+                                final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DiaryDetailScreen(
@@ -322,6 +324,11 @@ class CalendarScreen extends StatelessWidget {
                                     ),
                                   ),
                                 );
+
+                                // 결과에 따라 탭 이동
+                                if (result == 'diary') {
+                                  context.go(AppRoutes.diary);
+                                }
                               },
                               title: Text(entry.title),
                               subtitle: Column(

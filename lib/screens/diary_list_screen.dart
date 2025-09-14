@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../services/diary_service.dart';
 import '../services/team_selection_helper.dart';
 import '../models/diary_entry.dart';
 import '../models/emotion.dart';
 import '../widgets/team_info_widget.dart';
 import '../widgets/image_upload_indicator.dart';
+import '../routing/app_routes.dart';
 import 'diary_detail_screen.dart';
 
 enum SortOption {
@@ -363,8 +365,8 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DiaryDetailScreen(
@@ -373,6 +375,11 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                                 ),
                               ),
                             );
+
+                            // 결과에 따라 탭 이동
+                            if (result == 'calendar' && mounted) {
+                              context.go(AppRoutes.calendar);
+                            }
                           },
                         child: Padding(
                           padding: const EdgeInsets.all(16),
